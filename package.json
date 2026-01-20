@@ -1,5 +1,5 @@
 {
-  "name": "signal",
+  "name": "@rolandnsharp/signal",
   "version": "1.0.0",
   "description": "Minimal, composable audio synthesis for live coding.",
   "homepage": "https://github.com/rolandnsharp/signal#readme",

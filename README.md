@@ -5,7 +5,7 @@ Minimal, composable audio synthesis for live coding.
 ## Quick Start
 
 ```javascript
-const signal = require('signal');
+const signal = require('@rolandnsharp/signal');
 
 // Create a sine wave - audio starts automatically!
 signal('tone', t => Math.sin(2 * Math.PI * 432 * t) * 0.2);
@@ -14,7 +14,7 @@ signal('tone', t => Math.sin(2 * Math.PI * 432 * t) * 0.2);
 ## Installation
 
 ```bash
-npm install -g signal
+npm install -g @rolandnsharp/signal
 ```
 
 ## Live Coding
@@ -154,7 +154,7 @@ left.stereo(right)
 ### Rhythm
 
 ```javascript
-const signal = require('signal');
+const signal = require('@rolandnsharp/signal');
 const { step, euclidean } = signal;
 
 // Beat/phase info
@@ -167,7 +167,7 @@ const pattern = euclidean(5, 16)  // 5 pulses in 16 steps
 ### Melody
 
 ```javascript
-const signal = require('signal');
+const signal = require('@rolandnsharp/signal');
 const { freq, mtof, ftom, scales } = signal;
 
 // Scale degree to frequency
@@ -181,7 +181,7 @@ ftom(440) // => 69
 ### Scales
 
 ```javascript
-const signal = require('signal');
+const signal = require('@rolandnsharp/signal');
 const { scales } = signal;
 
 scales.major       // [0, 2, 4, 5, 7, 9, 11, 12]
@@ -194,7 +194,7 @@ scales.blues       // [0, 3, 5, 6, 7, 10, 12]
 ### Envelopes
 
 ```javascript
-const signal = require('signal');
+const signal = require('@rolandnsharp/signal');
 const { env } = signal;
 
 env.exp(phase, 5)                           // Exponential decay
@@ -209,7 +209,7 @@ Signal API works great with loops, arrays, and imperative logic:
 ### Generate Chord with Loop
 
 ```javascript
-const signal = require('signal');
+const signal = require('@rolandnsharp/signal');
 const { freq, scales } = signal;
 
 const chordDegrees = [0, 4, 7, 11];  // Major 7th
@@ -237,7 +237,7 @@ for (let i = 0; i < 8; i++) {
 ### Generate Drum Pattern with Nested Loops
 
 ```javascript
-const signal = require('signal');
+const signal = require('@rolandnsharp/signal');
 const { step, env } = signal;
 
 // Create multiple kick drums with different patterns
@@ -383,7 +383,7 @@ signal('bass').sin(110)
 ### Melodic Sequencer
 
 ```javascript
-const signal = require('signal');
+const signal = require('@rolandnsharp/signal');
 const { step, freq, env, scales } = signal;
 
 signal('melody', t => {
@@ -401,7 +401,7 @@ signal('melody', t => {
 ### Euclidean Kick
 
 ```javascript
-const signal = require('signal');
+const signal = require('@rolandnsharp/signal');
 const { step, euclidean, env } = signal;
 
 signal('kick', t => {
