@@ -9,20 +9,6 @@ const signal = require('./signal');
 
 // Create a sine wave - audio starts automatically!
 signal('tone').sin(432).gain(0.2);
-
-// Or create a composition with async/await
-const { sleep } = signal;
-
-const bass = signal('bass').sin(110).gain(0.3).stop();
-const melody = signal('melody').sin(440).gain(0.2).stop();
-
-async function play() {
-  bass.play();
-  await sleep(4000);
-  melody.play();
-}
-
-play();
 ```
 
 ## Live Coding
@@ -115,48 +101,6 @@ const layers = [
 layers.forEach((layer, i) => {
   setTimeout(() => layer.play(), i * 2000)
 })
-```
-
-### Bar-Based Composition (Bosca Ceoil Style)
-
-Musical timing based on bars/measures instead of milliseconds:
-
-```javascript
-const { bars, onBar, getCurrentBar, loop } = signal;
-const BPM = 120;
-
-// Wait for N bars (async/await)
-async function composition() {
-  pad.play();
-  await bars(4, BPM);    // Wait 4 bars
-
-  bass.play();
-  await bars(4, BPM);    // Wait 4 more bars
-
-  melody.play();
-  await bars(8, BPM);    // Wait 8 bars
-
-  bass.stop();           // Break
-}
-
-composition();
-
-// Trigger on specific bar (declarative)
-onBar(0, BPM, () => pad.play());        // Bar 0: Intro
-onBar(4, BPM, () => bass.play());       // Bar 4: Verse
-onBar(8, BPM, () => kick.play());       // Bar 8: Build
-onBar(12, BPM, () => melody.play());    // Bar 12: Chorus
-onBar(20, BPM, () => kick.stop());      // Bar 20: Break
-
-// Loop every N bars
-loop(4, BPM, (currentBar) => {
-  console.log(`Bar ${currentBar}: Loop trigger`);
-  // Do something every 4 bars
-});
-
-// Get current bar
-const bar = getCurrentBar(BPM);
-console.log(`Currently on bar ${bar}`);
 ```
 
 ### Mixing
@@ -348,110 +292,6 @@ signal('kick', t => {
 
 See `imperative-session.js` for more examples.
 
-### Time-Based Composition with Async/Await
-
-```javascript
-const { sleep } = signal;  // Built-in sleep helper
-
-// Create instruments (stopped)
-const bass = signal('bass').sin(110).gain(0.3).stop()
-const melody = signal('melody').sin(440).gain(0.2).stop()
-const pad = signal('pad').sin(220).gain(0.15).stop()
-
-// Clean async composition
-async function composition() {
-  console.log('Starting...');
-
-  pad.play();
-  await sleep(4000);
-
-  console.log('Adding bass...');
-  bass.play();
-  await sleep(4000);
-
-  console.log('Adding melody...');
-  melody.play();
-  await sleep(8000);
-
-  console.log('Break...');
-  bass.stop();
-  await sleep(4000);
-
-  console.log('Drop!');
-  bass.play();
-  await sleep(8000);
-
-  console.log('Outro...');
-  melody.stop();
-  bass.stop();
-  pad.stop();
-}
-
-composition();
-```
-
-### Async Patterns
-
-```javascript
-// Sequential - one after another
-await sleep(1000);
-bass.play();
-await sleep(1000);
-melody.play();
-
-// Parallel - start together
-bass.play();
-melody.play();
-pad.play();
-
-// Staggered - overlapping
-sleep(0).then(() => bass.play());
-sleep(500).then(() => melody.play());
-sleep(1000).then(() => pad.play());
-
-// Loop - repeating
-for (let i = 0; i < 4; i++) {
-  bass.play();
-  await sleep(500);
-  bass.stop();
-  await sleep(500);
-}
-
-// Conditional
-if (section === 'intro') {
-  pad.play();
-} else if (section === 'drop') {
-  bass.play();
-  melody.play();
-}
-await sleep(4000);
-
-// Array methods
-const layers = [bass, melody, pad];
-for (const layer of layers) {
-  layer.play();
-  await sleep(1000);
-}
-
-// Nested compositions
-async function intro() {
-  pad.play();
-  await sleep(4000);
-}
-
-async function verse() {
-  bass.play();
-  await sleep(8000);
-}
-
-await intro();
-await verse();
-```
-
-See `composition-async.js` and `async-patterns.js` for complete examples.
-
----
-
 ## Examples
 
 ### Tremolo
@@ -520,16 +360,6 @@ signal.clear()                  // Remove all signals
 signal.remove('name')           // Remove specific signal
 signal.list()                   // List all signal names
 signal.stopAudio()              // Stop audio output
-
-// Time helpers
-signal.sleep(ms)                // Promise-based sleep (milliseconds)
-signal.bars(n, bpm)             // Promise-based wait (N bars)
-
-// Bar-based composition
-signal.onBar(barNum, bpm, fn)   // Trigger on specific bar
-signal.getCurrentBar(bpm)       // Get current bar number
-signal.loop(bars, bpm, fn)      // Repeat every N bars
-signal.resetTimer()             // Reset bar counter
 ```
 
 ## Philosophy
@@ -549,13 +379,8 @@ signal.resetTimer()             // Reset bar counter
 - `envelopes.js` - Envelope shapes
 - `runner.js` - Hot reload runner
 - `builder-session.js` - Builder style examples (recommended)
-- `bosca-async.js` - Bar-based composition with async/await (Bosca Ceoil style)
-- `bosca-style.js` - Bar-based composition with onBar() (declarative)
-- `composition-async.js` - Time-based async/await composition
-- `async-patterns.js` - Async composition patterns
-- `composition-session.js` - Time-based composition with setTimeout
-- `performance-session.js` - Live performance layer control
 - `example-session.js` - Live coding example
+- `performance-session.js` - Live performance layer control
 - `imperative-session.js` - Imperative programming examples
 - `test-session.js` - API tests
 - `test-builder.js` - Builder syntax tests

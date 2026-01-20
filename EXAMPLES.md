@@ -40,82 +40,6 @@ signal('chord').sin(432)
 
 ---
 
-## Bar-Based Composition (Recommended)
-
-### Async/Await Style
-
-```javascript
-const { bars } = signal;
-const BPM = 120;
-
-// Create instruments (stopped)
-const pad = signal('pad').sin(220).gain(0.15).stop();
-const bass = signal('bass').sin(110).gain(0.3).stop();
-const melody = signal('melody').sin(440).gain(0.2).stop();
-
-async function song() {
-  // Intro - 4 bars
-  pad.play();
-  await bars(4, BPM);
-
-  // Verse - 8 bars
-  bass.play();
-  await bars(8, BPM);
-
-  // Chorus - 8 bars
-  melody.play();
-  await bars(8, BPM);
-
-  // Break - 4 bars
-  bass.stop();
-  melody.stop();
-  await bars(4, BPM);
-
-  // Outro
-  pad.stop();
-}
-
-song();
-```
-
-### Declarative Style
-
-```javascript
-const { onBar } = signal;
-const BPM = 120;
-
-const pad = signal('pad').sin(220).gain(0.15).stop();
-const bass = signal('bass').sin(110).gain(0.3).stop();
-const melody = signal('melody').sin(440).gain(0.2).stop();
-
-// Define song structure
-onBar(0, BPM, () => pad.play());         // Intro
-onBar(4, BPM, () => bass.play());        // Verse
-onBar(12, BPM, () => melody.play());     // Chorus
-onBar(20, BPM, () => {                   // Break
-  bass.stop();
-  melody.stop();
-});
-onBar(24, BPM, () => pad.stop());        // End
-```
-
-### Looping Patterns
-
-```javascript
-const { loop } = signal;
-const BPM = 140;
-
-const kick = signal('kick').sin(60).gain(0.4);
-
-// Trigger every 4 bars
-loop(4, BPM, (currentBar) => {
-  console.log(`Loop at bar ${currentBar}`);
-  // Change pattern every loop
-});
-```
-
----
-
 ## Melodic Sequencing
 
 ```javascript
@@ -300,86 +224,18 @@ layers.bass.stop();  // Remove bass
 
 ---
 
-## Complete Song Example
-
-```javascript
-const signal = require('./signal');
-const { step } = require('./signal/rhythm');
-const { freq } = require('./signal/melody');
-const { env } = require('./signal/envelopes');
-const scales = require('./signal/scales');
-const { bars } = signal;
-
-const BPM = 120;
-
-// Instruments
-const bass = signal('bass').fn(t => {
-  const { index, phase } = step(t, BPM, 2);
-  const pattern = [0, 0, 5, 3];
-  const f = freq(110, scales.minor, pattern[index % 4]);
-  return signal.sin(f).eval(t) * env.exp(phase, 3) * 0.3;
-}).stop();
-
-const melody = signal('melody').fn(t => {
-  const { index, phase } = step(t, BPM, 8);
-  const pattern = [0, 3, 5, 3, 7, 5, 3, 0];
-  const f = freq(440, scales.minor, pattern[index % 8]);
-  return signal.sin(f).eval(t) * env.exp(phase, 5) * 0.15;
-}).stop();
-
-const kick = signal('kick').fn(t => {
-  const { beat, phase } = step(t, BPM, 4);
-  if (beat % 4 !== 0 || phase > 0.25) return 0;
-  const f = 50 + 80 * env.exp(phase, 20);
-  return signal.sin(f).eval(t) * env.exp(phase, 10) * 0.35;
-}).stop();
-
-// Song structure
-async function song() {
-  // Intro
-  bass.play();
-  await bars(8, BPM);
-
-  // Verse
-  kick.play();
-  await bars(8, BPM);
-
-  // Chorus
-  melody.play();
-  await bars(16, BPM);
-
-  // Break
-  kick.stop();
-  melody.stop();
-  await bars(4, BPM);
-
-  // Outro
-  bass.stop();
-}
-
-song();
-```
-
----
-
 ## Run Examples
 
 ```bash
 # Builder style basics
-node signal/builder-session.js
-
-# Bar-based composition (async)
-node signal/bosca-async.js
-
-# Bar-based composition (declarative)
-node signal/bosca-style.js
+node builder-session.js
 
 # Imperative programming
-node signal/imperative-session.js
+node imperative-session.js
 
-# Async patterns
-node signal/async-patterns.js
+# Live performance template (with hot reload)
+node runner.js performance-session.js
 
-# Live performance template
-node signal/runner.js signal/performance-session.js
+# Live coding example
+node runner.js example-session.js
 ```
