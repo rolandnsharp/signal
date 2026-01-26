@@ -117,6 +117,24 @@ If you experiment your way into a "digital scream" or a crash:
 
 ## TODO / Future Enhancements
 
+- [ ] **Zero-Crossing Hot-Swap**: Implement glitch-free signal switching
+  ```js
+  // In engine.js's updateAudio function, wait for zero-crossing before switching
+  // This prevents clicks/pops during live surgery
+  function waitForZeroCrossing(signal) {
+    let prevSample = signal[0];
+    for (let i = 1; i < signal.length; i++) {
+      // Detect zero crossing (sign change)
+      if ((prevSample >= 0 && signal[i] < 0) || (prevSample < 0 && signal[i] >= 0)) {
+        return i; // Switch at this sample index
+      }
+      prevSample = signal[i];
+    }
+    return 0; // Fallback if no crossing found
+  }
+  ```
+  **Result**: All "Live Surgery" will be perfectly silent and sound professional. No more audio clicks when hot-swapping signals during performance.
+
 - [ ] **Wrapping Time (The "Kanonical" Fix)**: Prevent floating-point precision loss during long sessions
   ```js
   // Instead of t = 0 to Infinity, use T = t % (Large Prime or Power of Two)
