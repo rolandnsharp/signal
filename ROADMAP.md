@@ -368,6 +368,92 @@ Your engine has a **perfect "heart"** (the Surgery Logic). Adding these "limbs" 
 
 ---
 
+## 5. 🔬 Compiler Layer (Pure Math Syntax)
+
+### The Problem
+Current API requires genish primitives (`osc(440)`) which feel less mathematical than pure JS (`Math.sin(t * 440)`).
+
+### The Solution
+Build a **symbolic execution compiler** that translates pure JS math into stateful genish code.
+
+### The Dream API
+```javascript
+// User writes pure math:
+wave('sine', t => Math.sin(t * 440 * 2 * Math.PI));
+
+// Compiler generates stateful safety:
+wave('sine', () => {
+  const phase = peek(STATE, 100);
+  const newPhase = mod(add(phase, 440/44100), 1.0);
+  poke(STATE, newPhase, 100);
+  return peek(SINE_TABLE, newPhase);
+});
+```
+
+### Why It Matters
+- **Beautiful syntax**: Familiar JavaScript math
+- **Stateful safety**: Automatic STATE management
+- **Surgery continuity**: No phase jumps during hot-reload
+- **Best of both worlds**: Write pure functions, get stateful compilation
+
+### Implementation Options
+
+#### Option A: Pipe/Chain Syntax (Easiest)
+```javascript
+wave('clean', () => t.mul(440).sin().mul(0.5));
+```
+- No build tools needed
+- Works today
+- Avoids JS operator limitations
+
+#### Option B: Babel Plugin (Most Powerful)
+```javascript
+// Input:
+wave('sine', t => Math.sin(t * 440));
+
+// Babel transforms to phantom execution
+// Compiler adds STATE management
+```
+- Perfect "pure math" syntax
+- Requires build step
+- Full IDE support
+
+### The Key Insight
+
+**Pure `t` (time) pops during hot-reload:**
+```javascript
+At t = 10.5s:
+Old: sin(t) = +1.0   (peak)
+New: saw(t) = -1.0   (trough)
+Result: POP (speaker cone snaps)
+```
+
+**State prevents pops:**
+```javascript
+const lastPhase = peek(STATE, 0);  // "Where was I?"
+const newPhase = lastPhase + increment;  // Continue from there
+```
+
+The compiler provides the illusion of pure math while maintaining stateful continuity.
+
+### Bun + JACK FFI Integration
+
+The compiler layer works **perfectly** with Bun:
+- User writes: Pure JS math
+- Compiler: Adds STATE management
+- genish: JIT compiles to C-like code
+- Bun + JACK: Direct hardware access
+
+**Result:** Beautiful syntax + Maximum performance + Click-free surgery
+
+### Priority: **MEDIUM** 🟡
+Enhances developer experience but current API works well.
+
+### See Also
+Detailed technical specification in [COMPILER_LAYER.md](./COMPILER_LAYER.md)
+
+---
+
 ## Long-Term Vision (2027+)
 
 - **Network Sync**: Multiple KANON instances sync clock via WebRTC
@@ -375,5 +461,7 @@ Your engine has a **perfect "heart"** (the Surgery Logic). Adding these "limbs" 
 - **Visual Programming**: Node-based graph editor that generates signal.js code
 - **Hardware**: Dedicated KANON controller with haptic feedback
 - **Community**: Share patches via decentralized protocol (IPFS)
+- **Bun Native**: Port to Bun + JACK FFI for direct hardware access (keep Surgery Logic)
+- **Compiler Layer**: Pure JS math syntax with automatic STATE management
 
 The foundation is complete. The instrument is ready to grow.
