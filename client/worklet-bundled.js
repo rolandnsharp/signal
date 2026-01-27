@@ -5958,33 +5958,40 @@ ${output}
 // Functional DSP library wrapping genish.js for KANON
 
 // ============================================================================
-// TWO WAYS TO USE KANON:
+// MODERN 2026 KANON API - State-driven, not time-driven
 // ============================================================================
 //
-// 1. SIMPLE PATTERN - Pure genish (fast, no persistent state):
-//    wave('sine', (t) => mul(cycle(440), 0.5))
+// 1. COMPOSITIONAL API (Recommended) - Auto-slotted stateful oscillators:
+//    wave('drone', () => withLfo(mixGain(voices(440, 2, 4), 0.4), 0.3, 0.25))
 //
-//    Pros: Fast (compiled), clean syntax
-//    Cons: State resets on code changes (phase discontinuities)
+//    Pros: Extremely concise (40+ lines → 1 line), phase persists across
+//          hot-reload, automatic slot management, surgery-ready
+//    Note: The () => arrow function is REQUIRED for lazy evaluation and
+//          deterministic slot allocation
 //
-// 2. STATEFUL PATTERN - JavaScript state (enables live surgery):
-//    wave('drone', (t, state) => ({
-//      graph: mul(0, t),  // Dummy or real genish graph
-//      update: () => {
-//        let phase = state[0] || 0;
-//        phase = (phase + 440/44100) % 1.0;
-//        state[0] = phase;
-//        return Math.sin(phase * 2 * Math.PI) * 0.5;
-//      }
-//    }))
+// 2. LEGACY PATTERN - Manual peek/poke (for advanced DSP):
+//    wave('drone', () => {
+//      const phase = peek(globalThis.STATE, 0);
+//      const newPhase = mod(add(phase, 440/44100), 1.0);
+//      poke(globalThis.STATE, newPhase, 0);
+//      return peek(globalThis.SINE_TABLE, newPhase);
+//    })
 //
-//    Pros: Phase/state persists across code changes (live surgery!)
-//    Cons: Slower (JavaScript per-sample), more verbose
+//    Pros: Full control for feedback loops, physical models, custom DSP
+//    Cons: More verbose, manual slot management
+//
+// 3. HYBRID - Mix high-level sugar with manual state (slots 0-99 reserved):
+//    wave('drift', () => {
+//      const carrier = osc(440);  // Auto-slotted (100+)
+//      const drift = peek(globalThis.STATE, 0);  // Manual (0-99)
+//      poke(globalThis.STATE, drift + 0.01, 0);
+//      return mul(carrier, 0.5);
+//    })
 //
 // Choose based on your needs:
-// - Stateless effects/filters → Simple pattern
-// - Live-coded evolving textures → Stateful pattern
-// - Hybrid: Use genish for effects, JavaScript for oscillator state
+// - Quick patches → Compositional API
+// - Experimental DSP → Legacy manual peek/poke
+// - Complex control → Hybrid approach
 // ============================================================================
 
 const PI = Math.PI;
@@ -6143,6 +6150,90 @@ const karplus = (impulse, freq, damping = 0.995) => {
 
 const gain = (amt, sig) => g.mul(sig, amt);
 
+// ============================================================================
+// AUTO-SLOT STATEFUL OSCILLATORS (2026 Best Practice)
+// ============================================================================
+// Philosophy: State management is an ENGINE responsibility, not user responsibility
+// Slots 0-99: Reserved for manual peek/poke (Tier 2-3 users)
+// Slots 100+: Auto-allocated by sugar functions (Tier 1 users)
+
+// Internal slot counter (starts at 100, resets per wave callback)
+let _slotPointer = 100;
+const internalResetSlots = () => { _slotPointer = 100; };
+
+// Expose reset function for engine use (NOT for user code)
+globalThis._internalResetSlots = internalResetSlots;
+
+// ============================================================================
+// PRIMITIVES (Auto-slotted oscillators)
+// ============================================================================
+
+// Stateful sine oscillator with auto-slot allocation
+// Returns genish graph that reads/writes phase from STATE buffer
+const osc = (freq) => {
+  const slot = _slotPointer++;
+  const phase = g.peek(globalThis.STATE, slot, { mode: 'samples' });
+  const increment = g.div(freq, 44100);
+  const newPhase = g.mod(g.add(phase, increment), 1.0);
+  g.poke(globalThis.STATE, newPhase, slot);
+  return g.peek(globalThis.SINE_TABLE, newPhase);
+};
+
+// Low-frequency oscillator (unipolar: 0..1)
+// Just a wrapper around osc with bipolar->unipolar conversion
+const lfo = (rate) => {
+  const signal = osc(rate);
+  return g.mul(g.add(signal, 1.0), 0.5);  // Convert -1..1 to 0..1
+};
+
+// ============================================================================
+// HELPERS (Composition and mixing)
+// ============================================================================
+
+// Multi-voice detuned oscillators
+// Returns array of genish graphs
+const voices = (baseFreq, detune, count = 4) => {
+  const offsets = [0, detune, -detune * 1.5, detune * 2.2];
+  return offsets.slice(0, count).map(o => osc(baseFreq + o));
+};
+
+// Equal-power mix of multiple signals
+const mix = (...signals) => {
+  if (signals.length === 0) return 0;
+  if (signals.length === 1) return signals[0];
+  const sum = signals.reduce((a, b) => g.add(a, b));
+  return g.mul(sum, 1 / signals.length);
+};
+
+// Mix with overall gain control
+const mixGain = (signals, amt) => g.mul(mix(...signals), amt);
+
+// Apply unipolar LFO modulation to signal amplitude
+// depth: 0.0 (no modulation) to 1.0 (full amplitude swing)
+// LFO range becomes (1-depth)..1.0 for smooth pulsing without silence
+const withLfo = (signal, lfoRate, depth = 0.25) => {
+  const lfoSig = lfo(lfoRate);
+  const modAmount = g.mul(lfoSig, depth);
+  const amplitude = g.add(modAmount, 1 - depth);
+  return g.mul(signal, amplitude);
+};
+
+// ============================================================================
+// OPTIONAL: Chaining wrapper (fluent interface)
+// ============================================================================
+
+// Wrap signal for method chaining
+// CRITICAL: Must return raw genish nodes, not JS objects
+const $ = (signal) => ({
+  _sig: signal,
+  mul(v) { return $(g.mul(this._sig, v)); },
+  add(s) { return $(g.add(this._sig, s)); },
+  lp(c) { return $(lp(this._sig, c)); },
+  hp(c) { return $(hp(this._sig, c)); },
+  mod(modulator, depth) { return $(withLfo(this._sig, modulator, depth)); },
+  unwrap() { return this._sig; }
+});
+
 // Smooth gain changes to avoid pops
 const smoothGain = (amt, sig) => {
   return g.mul(sig, smooth(amt, 0.999));
@@ -6216,10 +6307,23 @@ globalScope.pipe = pipe;
 globalScope.bass = bass;
 globalScope.wobble = wobble;
 
+// Auto-slot oscillators (Tier 1: The Musician)
+globalScope.osc = osc;
+globalScope.lfo = lfo;
+
+// Composition helpers
+globalScope.voices = voices;
+globalScope.mix = mix;
+globalScope.mixGain = mixGain;
+globalScope.withLfo = withLfo;
+
+// Optional chaining wrapper
+globalScope.$ = $;
+
 // Expose raw genish primitives for advanced use
 globalScope.g = g;
 
-// Expose peek/poke for stateful genish patterns
+// Expose peek/poke for stateful genish patterns (Tier 2-3: Designer/Researcher)
 globalScope.peek = g.peek;
 globalScope.poke = g.poke;
 globalScope.data = g.data;
@@ -6319,6 +6423,15 @@ class GenishProcessor extends AudioWorkletProcessor {
           throw new Error('genish not available');
         }
 
+        // ==================================================================
+        // 2026 BEST PRACTICE: Reset slot counter before each recompilation
+        // This ensures deterministic mapping (osc(440) always gets same slot)
+        // ==================================================================
+        if (globalThis._internalResetSlots) {
+          globalThis._internalResetSlots();
+          this.port.postMessage({ type: 'info', message: 'Slot counter reset to 100' });
+        }
+
         this.port.postMessage({ type: 'info', message: 'Evaluating signal.js...' });
 
         // Eval the code - wave() calls will populate waveRegistry
@@ -6363,6 +6476,14 @@ class GenishProcessor extends AudioWorkletProcessor {
 
       // Create time accumulator
       const t = genish.accum(1 / this.sampleRate);
+
+      // ==================================================================
+      // CRITICAL: Reset slot counter BEFORE calling graphFn
+      // This ensures osc(440) gets the SAME slot even if code above changes
+      // ==================================================================
+      if (globalThis._internalResetSlots) {
+        globalThis._internalResetSlots();
+      }
 
       // Call user function with (t, state)
       // User can return either:

@@ -89,6 +89,15 @@ class GenishProcessor extends AudioWorkletProcessor {
           throw new Error('genish not available');
         }
 
+        // ==================================================================
+        // 2026 BEST PRACTICE: Reset slot counter before each recompilation
+        // This ensures deterministic mapping (osc(440) always gets same slot)
+        // ==================================================================
+        if (globalThis._internalResetSlots) {
+          globalThis._internalResetSlots();
+          this.port.postMessage({ type: 'info', message: 'Slot counter reset to 100' });
+        }
+
         this.port.postMessage({ type: 'info', message: 'Evaluating signal.js...' });
 
         // Eval the code - wave() calls will populate waveRegistry
@@ -133,6 +142,14 @@ class GenishProcessor extends AudioWorkletProcessor {
 
       // Create time accumulator
       const t = genish.accum(1 / this.sampleRate);
+
+      // ==================================================================
+      // CRITICAL: Reset slot counter BEFORE calling graphFn
+      // This ensures osc(440) gets the SAME slot even if code above changes
+      // ==================================================================
+      if (globalThis._internalResetSlots) {
+        globalThis._internalResetSlots();
+      }
 
       // Call user function with (t, state)
       // User can return either:

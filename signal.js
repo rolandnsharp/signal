@@ -1,60 +1,86 @@
-// signal.js - KANON Live-Coding Interface
+// signal.js - KANON Live-Coding Interface with Compositional API
 // ============================================================================
 // LIVE CODING: Edit this file while audio is playing for instant updates!
 // ============================================================================
-
-wave('hybrid-drone', (t) => {
-  // === LIVE EDIT THESE PARAMETERS ===
-  const baseFreq = 373;   // Try: 110, 220, 330, 440
-  const detune = 2;       // Try: 0.5, 2, 5, 10, 20 (chorus width)
-  const lfoRate = 0.3;    // Try: 0.1, 0.5, 1.0, 2.0 (pulsing speed)
-
-  // Voice frequencies with detuning
-  const freq1 = baseFreq;
-  const freq2 = baseFreq + detune;
-  const freq3 = baseFreq - (detune * 1.5);
-  const freq4 = baseFreq + (detune * 2.2);
-
-  // === VOICE 1 (STATE slot 0) ===
-  const phase1 = peek(globalThis.STATE, 0, { mode: 'samples' });
-  const newPhase1 = mod(add(phase1, freq1 / 44100), 1.0);
-  poke(globalThis.STATE, newPhase1, 0);
-  const osc1 = peek(globalThis.SINE_TABLE, newPhase1);
-
-  // === VOICE 2 (STATE slot 1) ===
-  const phase2 = peek(globalThis.STATE, 1, { mode: 'samples' });
-  const newPhase2 = mod(add(phase2, freq2 / 44100), 1.0);
-  poke(globalThis.STATE, newPhase2, 1);
-  const osc2 = peek(globalThis.SINE_TABLE, newPhase2);
-
-  // === VOICE 3 (STATE slot 2) ===
-  const phase3 = peek(globalThis.STATE, 2, { mode: 'samples' });
-  const newPhase3 = mod(add(phase3, freq3 / 44100), 1.0);
-  poke(globalThis.STATE, newPhase3, 2);
-  const osc3 = peek(globalThis.SINE_TABLE, newPhase3);
-
-  // === VOICE 4 (STATE slot 3) ===
-  const phase4 = peek(globalThis.STATE, 3, { mode: 'samples' });
-  const newPhase4 = mod(add(phase4, freq4 / 44100), 1.0);
-  poke(globalThis.STATE, newPhase4, 3);
-  const osc4 = peek(globalThis.SINE_TABLE, newPhase4);
-
-  // Mix the 4 voices
-  const mix = mul(add(add(add(osc1, osc2), osc3), osc4), 0.25);
-
-  // === LFO (STATE slot 10) ===
-  const lfoPhase = peek(globalThis.STATE, 10, { mode: 'samples' });
-  const newLfoPhase = mod(add(lfoPhase, lfoRate / 44100), 1.0);
-  poke(globalThis.STATE, newLfoPhase, 10);
-  const lfo = peek(globalThis.SINE_TABLE, newLfoPhase);
-
-  // LFO range: 0.5 to 1.0 (pulsing, never silent)
-  const lfoAmt = add(mul(lfo, 0.25), 0.75);
-
-  // Apply LFO and output gain
-  return mul(mul(mix, lfoAmt), 0.4);
-});
+// 2026 Modern API: State-driven, not time-driven
+// The () => arrow function is REQUIRED for lazy evaluation and hot-reload
+// ============================================================================
 
 // ============================================================================
-// Genish-compiled drone with 20ms equal-power crossfade
+// TIER 1: The Musician (Implicit, High-Level Sugar)
 // ============================================================================
+// Code reduction: 40+ lines → 1 line (98% reduction!)
+
+wave('minimal-drone', () =>
+  withLfo(mixGain(voices(333, 2, 4), 0.4), 0.3, 0.25)
+);
+
+// ============================================================================
+// LIVE CODING TEST - Try uncommenting and modifying these!
+// ============================================================================
+
+// Uncomment to add more voices (4 → 8):
+// wave('minimal-drone', () =>
+//   withLfo(mixGain(voices(375, 2, 8), 0.4), 0.3, 0.25)
+// );
+
+// Uncomment for wider detune (2 → 10Hz):
+// wave('minimal-drone', () =>
+//   withLfo(mixGain(voices(375, 10, 4), 0.4), 0.3, 0.25)
+// );
+
+// Uncomment for faster LFO (0.3 → 2.0 Hz):
+// wave('minimal-drone', () =>
+//   withLfo(mixGain(voices(375, 2, 4), 0.4), 2.0, 0.25)
+// );
+
+// ============================================================================
+// ALTERNATIVE STYLES
+// ============================================================================
+
+// Method chaining style (more readable for complex chains)
+// wave('chaining-drone', () =>
+//   $(mix(...voices(375, 2, 4)))
+//     .mod(0.3, 0.25)
+//     .mul(0.4)
+//     .unwrap()
+// );
+
+// Explicit style (good for understanding the flow)
+// wave('explicit-drone', () => {
+//   const v = voices(375, 2, 4);
+//   const mixed = mix(...v);
+//   const modulated = withLfo(mixed, 0.3, 0.25);
+//   return mul(modulated, 0.4);
+// });
+
+// ============================================================================
+// TIER 2: The Sound Designer (Mix of sugar + manual peek/poke)
+// ============================================================================
+// Use slots 0-99 for custom state, auto-slots start at 100+
+
+// wave('drifting-drone', () => {
+//   // Auto-slot oscillator
+//   const carrier = mul(osc(440), 0.5);
+//
+//   // Manual state for drift (slot 0)
+//   const driftVal = peek(globalThis.STATE, 0);
+//   const lfoVal = mul(lfo(0.5), 0.1);
+//   const newDrift = mod(add(driftVal, lfoVal), 10);
+//   poke(globalThis.STATE, newDrift, 0);
+//
+//   return carrier;
+// });
+
+// ============================================================================
+// TIER 3: The Researcher (Raw peek/poke for experimental DSP)
+// ============================================================================
+// Full manual control - patterns impossible with standard oscillators
+
+// Feedback chaos (non-linear feedback loop)
+// wave('feedback-chaos', () => {
+//   const last = peek(globalThis.STATE, 0);
+//   const next = sin(add(last, mul(last, 0.5)));
+//   poke(globalThis.STATE, next, 0);
+//   return mul(next, 0.3);
+// });
