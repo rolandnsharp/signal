@@ -23,8 +23,13 @@ class GenishProcessor extends AudioWorkletProcessor {
 
       // Create persistent state buffer for live surgery
       // This Float32Array survives ALL code recompilations
-      if (!globalThis.STATE) {
-        globalThis.STATE = new Float32Array(128).fill(0);
+      if (!globalThis.STATE_BUFFER) {
+        globalThis.STATE_BUFFER = new Float32Array(128);
+        // Initialize with small non-zero values to test
+        for (let i = 0; i < 128; i++) {
+          globalThis.STATE_BUFFER[i] = 0.001 * i;
+        }
+        this.port.postMessage({ type: 'info', message: `STATE buffer created, first value: ${globalThis.STATE_BUFFER[0]}` });
       }
 
       this.port.onmessage = this.handleMessage.bind(this);
@@ -86,14 +91,29 @@ class GenishProcessor extends AudioWorkletProcessor {
         throw new Error('genish.gen.createCallback not available');
       }
 
+      // CRITICAL: Create STATE data object in CURRENT genish.gen.memory context
+      // This ensures STATE is registered in the same memory space as the graph
+      globalThis.STATE = genish.data(globalThis.STATE_BUFFER, 1);
+      this.port.postMessage({
+        type: 'info',
+        message: `STATE created: ${JSON.stringify({
+          name: globalThis.STATE.name,
+          length: globalThis.STATE_BUFFER.length,
+          first: globalThis.STATE_BUFFER[0]
+        })}`
+      });
+
       // Create time accumulator
       const t = genish.accum(1 / this.sampleRate);
 
       // Call user function with (t, state)
       // User can return either:
       //   1. A genish graph directly: wave('name', (t) => mul(cycle(440), 0.5))
-      //   2. {graph, update} for stateful: wave('name', (t, state) => ({graph, update}))
-      const result = graphFn(t, globalThis.STATE);
+      //   2. {graph, update} for JS stateful: wave('name', (t, state) => ({graph, update}))
+      //      state is raw Float32Array for JavaScript access
+      //   3. Genish stateful: wave('name', (t) => genishGraph with peek(STATE, ...))
+      //      STATE is global genish.data() object accessible in graph
+      const result = graphFn(t, globalThis.STATE_BUFFER);
 
       let genishGraph, updateFn;
       if (result && typeof result === 'object' && result.graph) {
@@ -139,6 +159,9 @@ class GenishProcessor extends AudioWorkletProcessor {
     const output = outputs[0];
     const channel = output[0];
 
+    // Debug: log first few samples
+    let sampleDebugCount = this.sampleDebugCount || 0;
+
     for (let i = 0; i < channel.length; i++) {
       let sample = 0;
 
@@ -159,6 +182,12 @@ class GenishProcessor extends AudioWorkletProcessor {
           } else {
             // Simple pattern: pure genish graph
             currentSample = synth.graph.call(synth.context);
+          }
+
+          // Debug: log first few samples
+          if (sampleDebugCount < 5) {
+            this.port.postMessage({ type: 'info', message: `Sample ${sampleDebugCount} from '${label}': ${currentSample}` });
+            sampleDebugCount++;
           }
 
           // Handle crossfade during hot-swap
@@ -185,6 +214,7 @@ class GenishProcessor extends AudioWorkletProcessor {
       channel[i] = Math.max(-1, Math.min(1, sample));
     }
 
+    this.sampleDebugCount = sampleDebugCount;
     return true;
   }
 }

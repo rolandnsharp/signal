@@ -262,3 +262,9 @@ globalScope.wobble = wobble;
 
 // Expose raw genish primitives for advanced use
 globalScope.g = g;
+
+// Expose peek/poke for stateful genish patterns
+globalScope.peek = g.peek;
+globalScope.poke = g.poke;
+globalScope.data = g.data;
+// Note: STATE is exposed globally by worklet.js after creation
