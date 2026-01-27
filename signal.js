@@ -14,7 +14,7 @@ wave('live-drone', (t, state) => {
     graph: mul(0, t),  // Dummy graph (we generate samples in update)
     update: () => {
       // === LIVE EDIT THESE PARAMETERS ===
-      const baseFreq = 733;   // Try: 110, 220, 330, 440 (no clicks!)
+      const baseFreq = 796;   // Try: 110, 220, 330, 440 (no clicks!)
       const detune = 2;       // Try: 0.5, 2, 5, 10, 20 (chorus width)
       const lfoRate = 0.3;    // Try: 0.1, 0.5, 1.0, 2.0 (pulsing speed)
 

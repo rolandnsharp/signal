@@ -153,7 +153,7 @@ class GenishProcessor extends AudioWorkletProcessor {
       const current = this.registry.get(label);
 
       if (current) {
-        // Hot-swap: State-safe crossfade (50ms)
+        // Hot-swap: State-safe crossfade (20ms with equal-power curve)
         // Capture current STATE values for new graph to use during crossfade
         // This prevents old/new graphs from fighting over STATE writes
         const capturedState = new Float32Array(globalThis.STATE_BUFFER);
@@ -165,11 +165,11 @@ class GenishProcessor extends AudioWorkletProcessor {
           oldGraph: current.graph,
           oldContext: current.context,
           fade: 0.0,
-          fadeDuration: 0.05 * this.sampleRate,  // 50ms
+          fadeDuration: 0.02 * this.sampleRate,  // 20ms - fast but smooth
           capturedState: capturedState,  // New graph uses this during fade
           isFading: true
         });
-        this.port.postMessage({ type: 'info', message: `Recompiled '${label}' (state-safe xfade)` });
+        this.port.postMessage({ type: 'info', message: `Recompiled '${label}' (20ms equal-power xfade)` });
       } else {
         // First compilation
         this.registry.set(label, { graph: compiledCallback, context: context, update: updateFn, oldGraph: null, fade: 1.0 });
@@ -208,9 +208,11 @@ class GenishProcessor extends AudioWorkletProcessor {
             globalThis.STATE_BUFFER = realStateBuffer;
             const oldSample = synth.oldGraph.call(synth.oldContext);
 
-            // Crossfade between old and new
+            // Equal-power crossfade (prevents volume dip)
             const fadeValue = synth.fade / synth.fadeDuration;
-            currentSample = (currentSample * fadeValue) + (oldSample * (1 - fadeValue));
+            const fadeIn = Math.sin(fadeValue * Math.PI * 0.5);   // 0 -> 1
+            const fadeOut = Math.cos(fadeValue * Math.PI * 0.5);  // 1 -> 0
+            currentSample = (currentSample * fadeIn) + (oldSample * fadeOut);
 
             synth.fade++;
             if (synth.fade >= synth.fadeDuration) {
