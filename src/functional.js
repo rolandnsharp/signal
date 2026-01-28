@@ -56,6 +56,45 @@ const gain = curry((amt, fn) => t => fn(t) * amt);
 const offset = curry((amt, fn) => t => fn(t) + amt);
 const mix = (...fns) => t => fns.reduce((sum, fn) => sum + fn(t), 0);
 
+// ============================================================================
+// COMPOSITION HELPERS (EXPERIMENTAL)
+// ============================================================================
+//
+// NOTE: These helpers are candidates for a future, higher-level composition
+// library (e.g., `kanon-compose`).
+//
+// A more advanced API would likely involve a "Clip" object that bundles a
+// sound function with its duration (e.g., `{ play: t => ..., duration: 1.5 }`),
+// allowing for more elegant and less error-prone composition.
+
+// Plays a function `fn` only during the time interval [start, end).
+// The time passed to `fn` is relative to the start of the interval.
+const during = curry((start, end, fn) => t => {
+  if (t >= start && t < end) {
+    return fn(t - start);
+  }
+  return 0; // Silence outside the interval
+});
+
+// Plays a sequence of [sound, duration] pairs one after another.
+const sequence = (...pairs) => t => {
+  let accumulatedTime = 0;
+  for (const [fn, duration] of pairs) {
+    if (t >= accumulatedTime && t < accumulatedTime + duration) {
+      return fn(t - accumulatedTime);
+    }
+    accumulatedTime += duration;
+  }
+  return 0; // Silence after the sequence ends
+};
+
+// Loops a sound function `count` times, with each loop having a `duration`.
+const loop = curry((count, duration, fn) => t => {
+  if (t < 0 || t >= count * duration) return 0;
+  const localTime = t % duration;
+  return fn(localTime);
+});
+
 // Delay (pure functional - look backwards in time)
 const delay = curry((delayTime, fn) => t => {
   if (t < delayTime) return 0;
@@ -98,6 +137,9 @@ module.exports = {
   gain,
   offset,
   mix,
+  during,
+  sequence,
+  loop,
   delay,
   feedback
 };
