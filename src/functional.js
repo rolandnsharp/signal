@@ -1,7 +1,7 @@
 'use strict';
 
 // ============================================================================
-// FUNCTIONAL PROGRAMMING UTILITIES FOR SIGNAL
+// FUNCTIONAL PROGRAMMING UTILITIES FOR KANON
 // ============================================================================
 //
 // Pure functional tools for recursive and generative synthesis.
@@ -48,10 +48,10 @@ const curry = fn => {
 };
 
 // ============================================================================
-// SIGNAL UTILITIES
+// KANON UTILITIES
 // ============================================================================
 
-// Higher-order signal transformations (curried)
+// Higher-order function transformations (curried)
 const gain = curry((amt, fn) => t => fn(t) * amt);
 const offset = curry((amt, fn) => t => fn(t) + amt);
 const mix = (...fns) => t => fns.reduce((sum, fn) => sum + fn(t), 0);

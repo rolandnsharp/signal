@@ -1,7 +1,7 @@
 {
   "name": "@rolandnsharp/kanon",
   "version": "1.0.4",
-  "description": "Minimal, composable audio synthesis for live coding. Powered by Bun for proper tail call optimization.",
+  "description": "Pure functional audio synthesis - sound as a function of time. Pythagorean approach to discovering eternal harmonic ratios.",
   "homepage": "https://github.com/rolandnsharp/kanon#readme",
   "bugs": {
     "url": "https://github.com/rolandnsharp/kanon/issues"
@@ -26,5 +26,8 @@
   "dependencies": {
     "ramda": "^0.32.0",
     "speaker": "^0.5.5"
-  }
+  },
+  "trustedDependencies": [
+    "speaker"
+  ]
 }
