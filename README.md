@@ -2,7 +2,7 @@
 
 Minimal, composable audio synthesis for live coding.
 
-**⚡ Powered by Bun** - Kanon requires [Bun](https://bun.sh) for proper tail call optimization, enabling elegant recursive synthesis techniques like fractal music generation.
+**Kanon** (κανών) — from Greek, meaning "rule" or "measuring rod" — was the monochord instrument Pythagoras used to prove that harmony is mathematical ratio. By dividing a single string into precise proportions (1:2 for octaves, 2:3 for fifths), he revealed that beauty in sound emerges from number itself. This library honors that principle: sound as pure function, wave as eternal form, f(t) as the measuring rod of the sonic universe.
 
 ## What Makes Kanon Different?
 
