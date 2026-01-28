@@ -16,12 +16,21 @@ import { STRIDE } from './storage.js';
  */
 export function createTransport(mode, ringBuffer, sampleRate = 44100) {
   if (mode === 'PUSH') {
-    // Current implementation: Push to speaker.js via stream
+    // ========================================================================
+    // SPEAKER CONFIGURATION: 48kHz @ 32-bit float
+    // ========================================================================
+    // bitDepth: 32 - 4 bytes per sample (vs 2 bytes for 16-bit)
+    // float: true - Native floating-point format (no conversion needed!)
+    // sampleRate: 48000 - Pro audio standard
+    //
+    // This eliminates the int16 conversion entirely - we go from Float64
+    // state → Float32 output with zero quantization noise
     const speaker = new Speaker({
       channels: STRIDE,
-      bitDepth: 16,
+      bitDepth: 32,
       sampleRate,
       signed: true,
+      float: true,  // CRITICAL: Native float format
     });
 
     // ========================================================================
@@ -32,13 +41,13 @@ export function createTransport(mode, ringBuffer, sampleRate = 44100) {
     // Solution: Allocate ONE buffer at startup and reuse it for all reads
     // Result: Zero GC pressure in the audio hot path
     //
-    // Max size: 64K frames = ~1.5 seconds @ 44.1kHz (generous headroom)
-    const maxBufferSize = 65536 * STRIDE * 2; // 2 bytes per sample (16-bit)
+    // Max size: 64K frames = ~1.3 seconds @ 48kHz (generous headroom)
+    const maxBufferSize = 65536 * STRIDE * 4; // 4 bytes per sample (32-bit float)
     const reusableBuffer = Buffer.alloc(maxBufferSize);
 
     const stream = new Readable({
       read(size) {
-        const bytesPerSample = 2; // 16-bit = 2 bytes
+        const bytesPerSample = 4; // 32-bit float = 4 bytes
         let samples = Math.floor(size / (bytesPerSample * STRIDE));
         const available = ringBuffer.availableData();
 
@@ -49,14 +58,22 @@ export function createTransport(mode, ringBuffer, sampleRate = 44100) {
         // Fill what we have from ring buffer
         const toFill = Math.min(samples, available);
 
+        // ====================================================================
+        // NATIVE FLOAT WRITING: No Conversion!
+        // ====================================================================
+        // Beautiful simplification: We go directly from Float64 state
+        // to Float32 output without quantization. No more int16 conversion,
+        // clamping, or rounding. The math flows end-to-end in native format.
+        //
+        // Float32 range: Any value (including >1.0), but speaker expects ±1.0
+        // Our tanh() soft-clip in updateAll() already handles this perfectly
         for (let i = 0; i < toFill; i++) {
           const vector = ringBuffer.read();
 
           for (let ch = 0; ch < STRIDE; ch++) {
             const sample = vector[ch] || 0;
-            // Convert float (-1 to 1) to 16-bit signed int (-32768 to 32767)
-            const int16 = Math.max(-32768, Math.min(32767, Math.round(sample * 32767)));
-            reusableBuffer.writeInt16LE(int16, (i * STRIDE + ch) * bytesPerSample);
+            // Direct write - no conversion, no loss
+            reusableBuffer.writeFloatLE(sample, (i * STRIDE + ch) * bytesPerSample);
           }
         }
 

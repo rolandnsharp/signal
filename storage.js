@@ -7,7 +7,7 @@
 // STRIDE = 1 (Mono), STRIDE = 2 (Stereo), STRIDE = 4 (XYZW for 3D scope)
 export const STRIDE = 1;
 
-// Ring buffer size in frames (~740ms at 44.1kHz)
+// Ring buffer size in frames (~680ms at 48kHz)
 const FRAME_COUNT = 32768;
 
 // Initialize SharedArrayBuffer (survives Bun --hot reloads)
