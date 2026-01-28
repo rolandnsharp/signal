@@ -51,8 +51,9 @@ kanon('vortex-morph', (mem, idx) => {
   // --- SURGERY PARAMS (change these live!) ---
   const baseFreq = 110.0;    // Deep G2 note
   const modRatio = 1.618;    // Golden Ratio (non-harmonic shimmer)
+  // const modRatio = 2.1;    // Golden Ratio (non-harmonic shimmer)
   const morphSpeed = 0.2;    // How fast the "vortex" breathes (Hz)
-  const intensity = 5.0;     // Modulation depth (try 50.0 for chaos!)
+  const intensity = 6.0;     // Modulation depth (try 50.0 for chaos!)
 
   return {
     update: (sr) => {
