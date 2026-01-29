@@ -1,68 +1,27 @@
+// compositions/first-piece.js
+// ============================================================================
+// A simple, JIT-compilable sine wave to test the new Phase 2 engine.
+// ============================================================================
+
 const kanon = require('../src/index');
-const { sequence, during, mix, gain, loop } = require('../src/functional');
 const { mtof } = require('../src/melody');
 
-// ============================================================================
-// INSTRUMENTS
-// ============================================================================
+// Import the symbolic functions from the main kanon object
+const { t, sin, mul } = kanon;
 
-const sine = freq => t => Math.sin(2 * Math.PI * freq * t);
+// Define a pure f(t) recipe using the symbolic library.
+// This is the pattern our V1 compiler knows how to optimize.
+const simpleTone = t => sin(mul(t, 440));
 
-const sawtooth = freq => t => {
-  const x = t * freq;
-  return 2 * (x - Math.floor(x + 0.5));
-};
+// Register the recipe. The engine will now attempt to JIT-compile it.
+kanon('simple-tone', simpleTone);
 
-// ============================================================================
-// SECTION 1 (0s - 12s)
-// ============================================================================
+// For comparison, let's also register a non-compilable recipe.
+// This uses raw Math.sin, so it will fall back to f(t) mode.
+const nonCompilableTone = t => Math.sin(t * 220 * 2 * Math.PI) * 0.5;
+kanon('fallback-tone', nonCompilableTone);
 
-const melodyMotif = sequence(
-  [sine(mtof(60)), 0.25], [sine(mtof(62)), 0.25],
-  [sine(mtof(64)), 0.25], [sine(mtof(65)), 0.25],
-  [sine(mtof(67)), 0.5]
-);
 
-const bassMotif = sequence(
-  [sine(mtof(48)), 0.75], [sine(mtof(50)), 0.75]
-);
-
-const section1 = mix(
-  gain(0.4, loop(8, 1.5, melodyMotif)),
-  gain(0.5, loop(8, 1.5, bassMotif)),
-  gain(0.2, during(0, 12, sine(mtof(36)))) // Pad for this section
-);
-
-// ============================================================================
-// SECTION 2 (12s - 24s)
-// ============================================================================
-
-const arpeggioMotif = sequence(
-  [sawtooth(mtof(72)), 0.125], [sawtooth(mtof(76)), 0.125],
-  [sawtooth(mtof(79)), 0.125], [sawtooth(mtof(84)), 0.125]
-);
-
-const newBassMotif = sequence(
-  [sine(mtof(52)), 0.75], [sine(mtof(55)), 0.75]
-);
-
-const section2 = mix(
-  gain(0.4, loop(24, 0.5, arpeggioMotif)), // 24 * 0.5s = 12s
-  gain(0.5, loop(8, 1.5, newBassMotif))   // 8 * 1.5s = 12s
-);
-
-// ============================================================================
-// FINAL COMPOSITION
-// ============================================================================
-
-const finalPiece = mix(
-  during(0, 12, section1),
-  during(12, 24, section2)
-);
-
-// Register the final composition with Kanon to be played
-kanon('first-piece', finalPiece);
-
-console.log("Composition 'first-piece' is now playing.");
-console.log("This piece has two sections and will play for 24 seconds.");
-console.log("You can stop it by pressing Ctrl+C.");
+console.log("Registered 'simple-tone' (should be JIT-compiled) and 'fallback-tone' (should run in f(t) mode).");
+console.log("You should hear a mix of two sine waves.");
+console.log("Check the console logs to confirm which mode each is running in.");

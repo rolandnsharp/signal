@@ -1,25 +1,36 @@
 // src/audio_engine/player.js
 // ============================================================================
-// Player Class - Wraps an f(t) recipe and manages its playback state
+// Player Class - Wraps a recipe and manages its playback state.
+// It can handle both pure f(t) recipes and compiled, stateful update functions.
 // ============================================================================
 
-class Player { // Changed from export class
-  constructor(recipe) {
-    if (typeof recipe !== 'function') {
-      throw new Error('Player recipe must be a function f(t).');
+class Player {
+  /**
+   * @param {function} updateFn - The function to be called for each sample. Can be stateful (f()) or stateless (f(t)).
+   * @param {boolean} isStateful - A flag indicating the type of update function.
+   * @param {function} originalRecipe - The original f(t) recipe, stored for memoization purposes.
+   */
+  constructor(updateFn, isStateful = false, originalRecipe = null) {
+    if (typeof updateFn !== 'function') {
+      throw new Error('Player update function must be a function.');
     }
-    this.recipe = recipe;
-    this.crossfadeVolume = 1.0; // Initial volume, used for crossfading
-    this.fadeStartTime = -1; // -1 indicates no fade in progress
-    this.targetVolume = 1.0; // Target volume after fade
+    this.updateFn = updateFn;
+    this.isStateful = isStateful;
+    this.recipe = originalRecipe || updateFn; // Store original recipe for inspection/memoization
+
+    this.crossfadeVolume = 1.0;
+    this.fadeStartTime = -1;
+    this.targetVolume = 1.0;
   }
 
-  // Called by the Conductor for each sample
-  // Returns a single sample value (or [left, right] array for stereo)
+  /**
+   * Called by the Conductor for each sample.
+   * @param {number} t - The current time from the global CHRONOS clock.
+   * @returns {number|Array} A single sample value or a stereo pair.
+   */
   update(t) {
-    // Apply crossfadeVolume to the recipe's output
-    // The recipe itself is a function of time `t`
-    const output = this.recipe(t);
+    // Call the update function with or without the time argument based on whether it's stateful.
+    const output = this.isStateful ? this.updateFn() : this.updateFn(t);
 
     if (typeof output === 'number') {
       return output * this.crossfadeVolume;
@@ -30,10 +41,9 @@ class Player { // Changed from export class
     return 0; // Default to silence
   }
 
-  // Method to set crossfade volume (used by the Conductor during fades)
   setCrossfadeVolume(volume) {
-    this.crossfadeVolume = Math.max(0, Math.min(1, volume)); // Clamp between 0 and 1
+    this.crossfadeVolume = Math.max(0, Math.min(1, volume));
   }
 }
 
-module.exports = { Player }; // New export statement
+module.exports = { Player };

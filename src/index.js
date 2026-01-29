@@ -1,18 +1,21 @@
 // src/index.js
 // ============================================================================
-// Kanon Core - Compiler, Registry, and Engine Orchestration
+// Kanon Core - Symbolic JIT Compiler, Registry, and Engine Orchestration
 // ============================================================================
 
 const { Conductor } = require('./audio_engine/engine.js');
 const { Player } = require('./audio_engine/player.js');
 const { createTransport } = require('./audio_engine/transport.js');
+const { trace } = require('./audio_engine/tracer.js');
+const { compile } = require('./audio_engine/compiler.js');
+const { t } = require('./audio_engine/symbolic.js');
 
 // --- Compiler Cache for memoization ---
 const playerCache = new Map(); // Maps recipe.toString() -> Player instance
 const idToRecipeString = new Map(); // Maps player ID -> recipe.toString()
 
 // ============================================================================
-// CORE KANON FUNCTION (The Compiler)
+// CORE KANON FUNCTION (The Symbolic JIT Compiler)
 // ============================================================================
 function kanon(id, recipe) {
   if (typeof id !== 'string' || id.length === 0) {
@@ -27,64 +30,72 @@ function kanon(id, recipe) {
   let player = playerCache.get(recipeString);
 
   if (!player) {
-    // Recipe has not been seen before, create new Player and cache it
-    player = new Player(recipe);
+    // This recipe is new. Attempt to trace and compile it.
+    try {
+      // Step 1: Trace the recipe using the symbolic library to get an AST.
+      const ast = trace(recipe);
+
+      // Step 2: Compile the AST into a stateful, high-performance update function.
+      const statefulUpdate = compile(ast);
+
+      // Step 3: Create a new Player in "stateful" mode.
+      player = new Player(statefulUpdate, true, recipe);
+      console.log(`[Compiler] Successfully JIT-compiled recipe ID: ${id}`);
+
+    } catch (err) {
+      // If tracing or compilation fails, fall back to the original f(t) recipe.
+      console.warn(`[Compiler] Could not JIT-compile recipe ID: ${id}. Reason: ${err.message}. Falling back to f(t) mode.`);
+      player = new Player(recipe, false, recipe);
+    }
+
+    // Cache the newly created player (either stateful or f(t)).
     playerCache.set(recipeString, player);
-    console.log(`[Compiler] New player created for recipe ID: ${id}`);
   } else {
     console.log(`[Compiler] Reusing player from cache for recipe ID: ${id}`);
   }
 
-  // Keep track of which recipe string is associated with this ID
   idToRecipeString.set(id, recipeString);
 
   // Tell Conductor to use this player for this ID.
-  // Conductor handles crossfading if an old player for this ID existed.
   Conductor.setPlayer(id, player);
 
-  return player.recipe; // Return the original recipe for chaining/inspection
+  return player.recipe;
 }
 
 // ============================================================================
-// REGISTRY MANAGEMENT (Delegated to Conductor)
+// Make symbolic library available to users
+// ============================================================================
+kanon.t = t;
+kanon.sin = require('./audio_engine/symbolic.js').sin;
+kanon.mul = require('./audio_engine/symbolic.js').mul;
+kanon.add = require('./audio_engine/symbolic.js').add;
+kanon.pow = require('./audio_engine/symbolic.js').pow;
+kanon.literal = require('./audio_engine/symbolic.js').literal;
+
+// ============================================================================
+// REGISTRY & AUDIO CONTROL (Delegated to Conductor)
 // ============================================================================
 
 kanon.boot = function() {
-  if (Conductor.status().running) return; // Boot only once
-  // globalThis.SAMPLE_RATE is set in engine.js
+  if (Conductor.status().running) return;
   const transportInstance = createTransport('PUSH', globalThis.SAMPLE_RATE);
   Conductor.start(transportInstance);
 };
 
-kanon.list = function() {
-  return Array.from(Conductor.status().activePlayers.keys());
-};
-
-kanon.remove = function(id) {
+kanon.list = () => Array.from(Conductor.status().activePlayers.keys());
+kanon.remove = (id) => {
   Conductor.removePlayer(id);
-  // No need to remove from playerCache, as another ID might still use it.
-  // Only remove idToRecipeString mapping.
   idToRecipeString.delete(id);
 };
-
-kanon.clear = function() {
+kanon.clear = () => {
   Conductor.clearPlayers();
-  playerCache.clear(); // Clear all cached players
-  idToRecipeString.clear(); // Clear mapping
+  playerCache.clear();
+  idToRecipeString.clear();
 };
-
-// ============================================================================
-// AUDIO CONTROL (Delegated to Conductor)
-// ============================================================================
-
-kanon.stopAudio = function() {
+kanon.stopAudio = () => {
   Conductor.stop();
-  playerCache.clear(); // Clear all cached players on stop
+  playerCache.clear();
   idToRecipeString.clear();
 };
 
-// ============================================================================
-// Exports
-// ============================================================================
-
-module.exports = kanon; // Export the compiler as the main kanon interface
+module.exports = kanon;
