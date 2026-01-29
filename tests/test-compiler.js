@@ -3,41 +3,48 @@
 // Test for the AST Compiler
 //
 // This test verifies that we can compile an AST into a stateful, high-performance
-// update function.
-//
-// To run: bun tests/test-compiler.js
+// update function, now adapted for the new compiler API.
 // ============================================================================
 
-import { trace } from '../src/audio_engine/tracer.js';
-import { compile } from '../src/audio_engine/compiler.js';
-import { t, mul, sin } from '../src/audio_engine/symbolic.js';
-import assert from 'assert';
+const { trace } = require('../src/audio_engine/tracer.js');
+const { compile } = require('../src/audio_engine/compiler.js');
+const { t, mul, sin } = require('../src/audio_engine/symbolic.js');
+const assert = require('assert');
 
-// Mock the global sample rate for testing purposes
+// Mock global state and sample rate for testing purposes
 globalThis.SAMPLE_RATE = 44100;
+globalThis.dt = 1 / globalThis.SAMPLE_RATE;
+
+// Initialize a global state array (Float64Array) for the player states
+const MAX_PLAYERS = 1; // We only need one player for this test
+const SLOTS_PER_PLAYER = 16; // As per proposal
+globalThis.STATE_ARRAY = new Float64Array(new SharedArrayBuffer(MAX_PLAYERS * SLOTS_PER_PLAYER * Float64Array.BYTES_PER_ELEMENT));
 
 console.log('Running Compiler Test...');
 
-// 1. Define and trace the recipe
-const recipe = t => sin(mul(t, 1)); // Use 1Hz for easy-to-read output
+// 1. Define and trace a simple sine oscillator recipe
+const frequency = 1; // 1Hz for easy verification
+const recipe = t => sin(mul(t, frequency));
 const ast = trace(recipe);
+
+// Define a base index for this player in the global state array
+const baseStateIndex = 0; 
 
 try {
   // 2. Compile the AST
-  const statefulUpdate = compile(ast);
+  const statefulUpdate = compile(ast, baseStateIndex);
 
   // 3. Verify the output
   assert.strictEqual(typeof statefulUpdate, 'function', 'Compiler did not return a function.');
-
   console.log('✅ Compiler returned a function.');
 
   // 4. Run the stateful function and check its output
-  // It should produce a sine wave, proving it's a stateful oscillator.
-  console.log('Testing oscillator output for 5 samples:');
+  // The stateful function now expects (globalState, baseIdx, dt)
+  console.log('Testing oscillator output for 5 samples (1Hz):');
   const samples = [];
   for (let i = 0; i < 5; i++) {
-    // Note: we pass a dummy `t` value, which the stateful function should ignore.
-    const sample = statefulUpdate(i); 
+    // We pass globalThis.STATE_ARRAY, baseStateIndex, and globalThis.dt
+    const sample = statefulUpdate(globalThis.STATE_ARRAY, baseStateIndex, globalThis.dt); 
     samples.push(sample);
     console.log(`  Sample ${i}: ${sample.toFixed(4)}`);
   }
