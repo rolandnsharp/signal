@@ -1,14 +1,14 @@
-# FLUX - Live Sound Surgery Engine
+# Kanon - Live Sound Surgery Engine
 
-> *"Panta Rhei" (Everything Flows) - Heraclitus*
+> *"All things are number."* - Pythagoras
 
-A state-driven live-coding environment for sound synthesis. Edit JavaScript, save, and hear changes instantly with **zero phase resets**. True surgical manipulation of living sound.
+A state-driven live-coding environment for sound synthesis inspired by the Pythagorean monochord. Edit JavaScript, save, and hear changes instantly with **zero phase resets**. True surgical manipulation of living sound.
 
 ## Philosophy
 
-Flux embodies **Heraclitean flow** - sound as a continuous river of state transformations. Unlike traditional `f(t)` synthesis, Flux treats signals as **living processes with momentum and memory**. When you edit parameters, the signal morphs seamlessly because its state persists across code changes.
+**Kanon** (κανών - "rule" or "measure") embodies Pythagorean music theory - sound as mathematical ratios made audible. Like the ancient monochord that revealed harmony's mathematical foundations, Kanon treats your state array as a vibrating string that never stops.
 
-This is the companion to [Kanon](https://github.com/yourname/kanon) (Pythagorean absolute `f(t)` mathematics).
+When you edit parameters, the signal morphs seamlessly because its state persists across code changes. The monochord's string continues vibrating; only the tension changes.
 
 ## Quick Start
 
@@ -28,7 +28,7 @@ bun --hot index.js
 ┌───────────────────────────────────────────┐
 │  signals.js - Live Coding Interface       │  ← Edit this!
 ├───────────────────────────────────────────┤
-│  flux.js - Signal Registry (FRP)          │  ← State transformers
+│  kanon.js - Signal Registry (FRP)         │  ← State transformers
 ├───────────────────────────────────────────┤
 │  storage.js - Ring Buffer (The Well)      │  ← SharedArrayBuffer
 ├───────────────────────────────────────────┤
@@ -40,7 +40,7 @@ bun --hot index.js
 
 ### Key Features
 
-- **Phase Continuity**: State persists in `globalThis.FLUX_STATE` during hot-reload
+- **Phase Continuity**: State persists in `globalThis.KANON_STATE` during hot-reload
 - **Zero-Copy Architecture**: `subarray()` eliminates GC pauses
 - **Soft Clipping**: All signals auto-clipped with `Math.tanh()` for safety
 - **48kHz @ 32-bit float**: Native floating-point audio (no int16 quantization)
@@ -52,9 +52,9 @@ bun --hot index.js
 ### Simple Sine Wave
 
 ```javascript
-import { flux } from './flux.js';
+import { kanon } from './kanon.js';
 
-flux('carrier', (mem, idx) => {
+kanon('carrier', (mem, idx) => {
   const freq = 440.0; // Change this and save - NO CLICKS!
 
   return {
@@ -69,10 +69,35 @@ flux('carrier', (mem, idx) => {
 });
 ```
 
+### Pythagorean Harmony
+
+```javascript
+kanon('harmony', (mem, idx) => {
+  const fundamental = 220.0; // A3
+  const fifth = fundamental * 3/2;  // Perfect fifth (1.5)
+  const fourth = fundamental * 4/3; // Perfect fourth (1.333...)
+
+  return {
+    update: (sr) => {
+      // Three voices in pure Pythagorean ratios
+      mem[idx] = (mem[idx] + fundamental / sr) % 1.0;
+      mem[idx + 1] = (mem[idx + 1] + fifth / sr) % 1.0;
+      mem[idx + 2] = (mem[idx + 2] + fourth / sr) % 1.0;
+
+      const s1 = Math.sin(mem[idx] * 2 * Math.PI);
+      const s2 = Math.sin(mem[idx + 1] * 2 * Math.PI);
+      const s3 = Math.sin(mem[idx + 2] * 2 * Math.PI);
+
+      return [(s1 + s2 + s3) * 0.2];
+    }
+  };
+});
+```
+
 ### Vortex Morph (Phase Modulation)
 
 ```javascript
-flux('vortex-morph', (mem, idx) => {
+kanon('vortex-morph', (mem, idx) => {
   // --- SURGERY PARAMS (change these live!) ---
   const baseFreq = 110.0;      // Deep G2 note
   const modRatio = 1.618;      // Golden Ratio
@@ -115,7 +140,7 @@ const vanDerPolStep = (state, { mu, dt }) => {
   return [x + dx * dt, y + dy * dt];
 };
 
-flux('van-der-pol', (mem, idx) => {
+kanon('van-der-pol', (mem, idx) => {
   // --- SURGERY PARAMETERS ---
   const params = { mu: 1.5, dt: 0.12 };
 
@@ -144,7 +169,7 @@ flux('van-der-pol', (mem, idx) => {
 
 ## Live Surgery Workflow
 
-1. **Start Flux**: `bun --hot index.js`
+1. **Start Kanon**: `bun --hot index.js`
 2. **Open** `signals.js` in your editor
 3. **Edit** a parameter (e.g., `intensity = 6.0` → `intensity = 12.0`)
 4. **Save** (`:w` in Vim)
@@ -155,24 +180,24 @@ flux('van-der-pol', (mem, idx) => {
 When you save `signals.js`:
 1. Bun reloads the module
 2. The old signal registry is cleared
-3. New `flux()` calls register fresh closures with updated parameters
-4. **State in `globalThis.FLUX_STATE` is untouched**
+3. New `kanon()` calls register fresh closures with updated parameters
+4. **State in `globalThis.KANON_STATE` is untouched**
 5. Signal continues from exact phase position with new math
 
-This is **phase-continuous hot-swapping**.
+This is **phase-continuous hot-swapping** - like adjusting the monochord's string tension while it vibrates.
 
 ## State Management
 
 ### Persistent State Buffer
 
 ```javascript
-globalThis.FLUX_STATE ??= new Float64Array(1024);
+globalThis.KANON_STATE ??= new Float64Array(1024);
 ```
 
 Each signal gets a deterministic slot via string hash:
 
 ```javascript
-flux('my-signal', (mem, idx) => {
+kanon('my-signal', (mem, idx) => {
   // You get ~3-4 slots typically
   mem[idx]     // First variable (e.g., phase)
   mem[idx + 1] // Second variable (e.g., LFO)
@@ -187,7 +212,7 @@ flux('my-signal', (mem, idx) => {
 
 ### Core Functions
 
-#### `flux(id, factory)`
+#### `kanon(id, factory)`
 Register a signal for live surgery.
 
 - **id** (string): Unique identifier
@@ -213,7 +238,7 @@ Remove a specific signal by ID.
 
 - **index.js** - Entry point, console interface
 - **engine.js** - Producer loop, lifecycle management
-- **flux.js** - Signal registry & mixing logic
+- **kanon.js** - Signal registry & mixing logic
 - **storage.js** - Ring buffer (SharedArrayBuffer)
 - **transport.js** - Audio output (speaker.js)
 - **signals.js** - **YOUR CODE** - Live-codeable signal definitions
@@ -239,13 +264,26 @@ Traditional systems evaluate `f(t)` - a pure function of time:
 const sample = Math.sin(t * 2 * Math.PI * freq);
 ```
 
-Flux uses `f(state)` - recursive state transformations:
+Kanon uses `f(state)` - recursive state transformations:
 
 ```javascript
 // Phase persists across parameter changes
 mem[idx] = (mem[idx] + freq / sr) % 1.0;
 const sample = Math.sin(mem[idx] * 2 * Math.PI);
 ```
+
+### The Monochord Philosophy
+
+Pythagoras discovered that harmony is mathematical using the monochord - a single vibrating string:
+- Divide at 1:2 = Octave
+- Divide at 2:3 = Perfect Fifth
+- Divide at 3:4 = Perfect Fourth
+
+In Kanon:
+- Your state array is the vibrating string
+- Phase accumulation is continuous vibration
+- Hot-reload adjusts tension while the string plays
+- The monochord never stops. Neither does your music.
 
 ### vs. Lisp/Incudine
 
@@ -258,20 +296,14 @@ See [DOCS/BEYOND-LISP.md](DOCS/BEYOND-LISP.md) for philosophical comparison.
 - Web-native deployment
 - NPM ecosystem access
 
-### vs. Modular Synthesizers (The Philosophical Ancestor)
-
-The `f(state)` paradigm is the software embodiment of hardware modular synthesis (e.g., Eurorack).
-
-- **A Modular Patch is a Stateful System**: The state is physical—voltages held in capacitors, the position of knobs, the flow of current. The system is always "on."
-- **Turning a Knob is Live Surgery**: When you patch a cable or turn a knob, you are altering a parameter within a continuously running process. You don't "restart" the sound; you guide its flow.
-
-Flux models this behavior directly in code. The `FLUX_STATE` buffer is the rack's power supply and memory. Your `signals.js` file is the patch itself. Editing a parameter is the digital equivalent of turning a knob on a living instrument.
-
 ## Documentation
 
 - **[SURGERY_GUIDE.md](DOCS/SURGERY_GUIDE.md)** - Live coding workflow and best practices
-- **[BEYOND-LISP.md](DOCS/BEYOND-LISP.md)** - How Flux transcends Lisp/Incudine
-- **[KANON-FLUX-DUALITY.md](DOCS/KANON-FLUX-DUALITY.md)** - Philosophical foundation
+- **[BEYOND-LISP.md](DOCS/BEYOND-LISP.md)** - How Kanon transcends Lisp/Incudine
+- **[PERFORMANCE_OPTIMIZATION.md](PERFORMANCE_OPTIMIZATION.md)** - Optimization strategies
+- **[AUDIO_BACKEND_ARCHITECTURE.md](AUDIO_BACKEND_ARCHITECTURE.md)** - Backend design
+- **[SAMPLE_RATE_ARCHITECTURE.md](SAMPLE_RATE_ARCHITECTURE.md)** - Sample rate handling
+- **[STATE_MANAGEMENT_BEST_PRACTICES.md](STATE_MANAGEMENT_BEST_PRACTICES.md)** - State patterns
 
 ## Roadmap
 
@@ -292,6 +324,7 @@ Inspired by:
 - SuperCollider (live coding pioneer)
 - TidalCycles (pattern-based live coding)
 - Max/MSP (dataflow paradigm)
+- Pythagoras and the monochord
 
 Built with:
 - [Bun](https://bun.sh) - Fast JavaScript runtime
@@ -303,4 +336,4 @@ MIT
 
 ---
 
-*"You can't step in the same river twice, but you can change its current while standing in it."* - Flux Engineering Principle
+*"The monochord never stopped vibrating. It just evolved."* - Kanon Engineering Principle

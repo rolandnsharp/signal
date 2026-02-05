@@ -79,7 +79,7 @@ const evalServer = serve({
 # Create named pipe
 mkfifo /tmp/kanon-eval
 
-# Flux reads from pipe
+# Kanon reads from pipe
 tail -f /tmp/kanon-eval | bun eval-stdin.js
 
 # Vim writes to pipe
@@ -99,7 +99,7 @@ echo "kanon('test', ...)" > /tmp/kanon-eval
 ## Testing Plan
 1. Start kanon with eval server: `bun --hot --eval-server index.js`
 2. Open signals.js in vim
-3. Select a flux() definition
+3. Select a kanon() definition
 4. Press `<Leader>e`
 5. Verify sound changes without file save
 

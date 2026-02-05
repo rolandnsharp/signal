@@ -1,4 +1,4 @@
-# Flux Architecture (2026)
+# Kanon Architecture (2026)
 
 ## Migration from Genish/Browser Architecture
 
@@ -50,10 +50,10 @@ return [Math.sin(mem[idx] * 2 * Math.PI) * 0.5];
 
 ### 2. Phase Continuity
 
-State persists in `globalThis.FLUX_STATE` during hot-reload:
+State persists in `globalThis.KANON_STATE` during hot-reload:
 
 ```javascript
-globalThis.FLUX_STATE ??= new Float64Array(1024);
+globalThis.KANON_STATE ??= new Float64Array(1024);
 ```
 
 When you change a parameter and save, Bun reloads the module but the Float64Array remains untouched, preserving oscillator phases.
@@ -131,7 +131,7 @@ export const STRIDE = 1; // Easy to change later
 kanon('sine', (t) => mul(cycle(440), 0.5));
 
 // New
-flux('sine', (mem, idx) => ({
+kanon('sine', (mem, idx) => ({
   update: (sr) => {
     mem[idx] = (mem[idx] + 440 / sr) % 1.0;
     return [Math.sin(mem[idx] * 2 * Math.PI) * 0.5];
@@ -155,7 +155,7 @@ kanon('drone', (t, state) => {
 });
 
 // New
-flux('drone', (mem, idx) => ({
+kanon('drone', (mem, idx) => ({
   update: (sr) => {
     mem[idx] = (mem[idx] + 220 / sr) % 1.0;
     return [Math.sin(mem[idx] * 2 * Math.PI) * 0.7];

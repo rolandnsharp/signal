@@ -4,7 +4,7 @@
 // ============================================================================
 
 import { ringBuffer } from './storage.js';
-import { updateAll } from './flux.js';
+import { updateAll } from './kanon.js';
 import { createTransport } from './transport.js';
 
 // ============================================================================

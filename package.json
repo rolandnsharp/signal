@@ -1,5 +1,5 @@
 {
-  "name": "flux",
+  "name": "kanon",
   "module": "index.js",
   "type": "module",
   "devDependencies": {

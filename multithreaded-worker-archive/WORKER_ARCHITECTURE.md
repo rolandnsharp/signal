@@ -30,18 +30,18 @@ Main Thread                                     Worker Thread
             ▼                                                   ▼
 ┌────────────────────────────────────────────────────────────────────────────────┐
 │ Shared Memory (SharedArrayBuffer)                                             │
-│   - FLUX_STATE (Signal state)                                                 │
+│   - KANON_STATE (Signal state)                                                 │
 │   - Ring Buffer (Audio samples)                                               │
 └────────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ### Key Changes:
 
-1. **`worker.js` (New File):** This file will contain the high-priority, uninterrupted audio generation loop (`fillBuffer`). It will read from the shared `FLUX_STATE` and write to the shared ring buffer.
+1. **`worker.js` (New File):** This file will contain the high-priority, uninterrupted audio generation loop (`fillBuffer`). It will read from the shared `KANON_STATE` and write to the shared ring buffer.
 2. **`engine.js` (Refactored):** This file will no longer contain the `fillBuffer` loop. Instead, it will be responsible for:
    * Spawning the `worker.js` thread.
    * Sending control messages (e.g., `start`, `stop`) to the worker.
-3. **Shared State:** Both the `ringBuffer` and the `FLUX_STATE` will be backed by `SharedArrayBuffer` instances to allow for zero-copy access from both the main thread and the worker thread.
+3. **Shared State:** Both the `ringBuffer` and the `KANON_STATE` will be backed by `SharedArrayBuffer` instances to allow for zero-copy access from both the main thread and the worker thread.
 
 ## Rationale & Benefits
 

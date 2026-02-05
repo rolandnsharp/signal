@@ -8,7 +8,7 @@
 
 ```javascript
 // signals.js
-flux('sine', (mem, idx) => ({
+kanon('sine', (mem, idx) => ({
   update: (sr) => {
     //      ^^-- Sample rate passed 48,000 times/second
     mem[idx] = (mem[idx] + 440/sr) % 1.0;  // Division every sample
@@ -31,7 +31,7 @@ flux('sine', (mem, idx) => ({
 
 ```javascript
 // signals.js
-flux('sine', (mem, idx, sr) => {
+kanon('sine', (mem, idx, sr) => {
   //                       ^^-- Sample rate passed ONCE to factory
   const phaseInc = 440 / sr;  // Division computed ONCE
 
@@ -106,7 +106,7 @@ On 3GHz CPU: ~0.8% of one core
 ```javascript
 // User has to know about JACK
 const jackSR = jack.getSampleRate();
-flux('sine', (mem, idx, sr) => { ... }, jackSR);  // Ugly!
+kanon('sine', (mem, idx, sr) => { ... }, jackSR);  // Ugly!
 ```
 
 ### Solution: Backend Sets Sample Rate Automatically
@@ -134,9 +134,9 @@ export const SAMPLE_RATE = (() => {
 // flux.js - Automatically uses backend's SR
 import { SAMPLE_RATE } from './transport.js';
 
-export function flux(id, factory) {
+export function kanon(id, factory) {
   const idx = hash(id);
-  const signal = factory(globalThis.FLUX_STATE, idx, SAMPLE_RATE);
+  const signal = factory(globalThis.KANON_STATE, idx, SAMPLE_RATE);
   //                                                  ^^^^^^^^^^^^
   registry.set(id, signal);
 }
@@ -144,7 +144,7 @@ export function flux(id, factory) {
 
 ```javascript
 // signals.js - User code never changes!
-flux('sine', (mem, idx, sr) => {
+kanon('sine', (mem, idx, sr) => {
   const phaseInc = 440 / sr;  // sr automatically set by backend
   return {
     update: () => {
@@ -204,7 +204,7 @@ Same with sample rate:
 const SAMPLE_RATE = detectSampleRate();
 
 // Use throughout performance (never changes)
-flux('sine', (mem, idx, sr) => {
+kanon('sine', (mem, idx, sr) => {
   const phaseInc = 440 / sr;  // Computed once
   return { update: () => { /* ... */ } };
 });
@@ -216,7 +216,7 @@ flux('sine', (mem, idx, sr) => {
 
 ### Phase 1: Current State (Working)
 ```javascript
-flux('sine', (mem, idx) => ({
+kanon('sine', (mem, idx) => ({
   update: (sr) => {
     mem[idx] = (mem[idx] + 440/sr) % 1.0;
     return [Math.sin(mem[idx] * TAU)];
@@ -228,7 +228,7 @@ flux('sine', (mem, idx) => ({
 
 ### Phase 2: Pre-Compute Phase Increment (Better)
 ```javascript
-flux('sine', (mem, idx, sr) => {
+kanon('sine', (mem, idx, sr) => {
   const phaseInc = 440 / sr;
   return {
     update: () => {
@@ -247,13 +247,13 @@ flux('sine', (mem, idx, sr) => {
 export const SAMPLE_RATE = detectBackendSampleRate();
 
 // flux.js
-export function flux(id, factory) {
+export function kanon(id, factory) {
   const signal = factory(mem, idx, SAMPLE_RATE);
   registry.set(id, signal);
 }
 
 // signals.js (unchanged)
-flux('sine', (mem, idx, sr) => {
+kanon('sine', (mem, idx, sr) => {
   const phaseInc = 440 / sr;
   return { update: () => { /* ... */ } };
 });
@@ -267,7 +267,7 @@ flux('sine', (mem, idx, sr) => {
 
 ### Current Pattern
 ```javascript
-flux('fm-synth', (mem, idx) => ({
+kanon('fm-synth', (mem, idx) => ({
   update: (sr) => {
     // All setup happens 48k times/sec
     const carrierFreq = 440;
@@ -285,7 +285,7 @@ flux('fm-synth', (mem, idx) => ({
 
 ### Proposed Pattern
 ```javascript
-flux('fm-synth', (mem, idx, sr) => {
+kanon('fm-synth', (mem, idx, sr) => {
   // Setup ONCE
   const carrierFreq = 440;
   const modFreq = 6;

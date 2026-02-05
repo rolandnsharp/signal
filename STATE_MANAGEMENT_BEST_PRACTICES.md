@@ -19,7 +19,7 @@
 ### The Foundation: Float64Array
 
 ```javascript
-globalThis.FLUX_STATE = new Float64Array(1024);
+globalThis.KANON_STATE = new Float64Array(1024);
 ```
 
 **Why this specific choice?**
@@ -46,7 +46,7 @@ globalThis.FLUX_STATE = new Float64Array(1024);
 
 ```javascript
 // ANTI-PATTERN: Wrapping memory in getters/setters
-flux('sine', (mem, idx) => {
+kanon('sine', (mem, idx) => {
   // Creating wrapper objects
   const phase = {
     get val() { return mem[idx]; },
@@ -119,7 +119,7 @@ const STATE = {
 ### ✅ The Right Way
 
 ```javascript
-flux('fm-synth', (mem, idx, sr) => {
+kanon('fm-synth', (mem, idx, sr) => {
   // 1. Define state layout (zero runtime cost)
   const STATE = {
     CARRIER_PHASE: idx,
@@ -205,7 +205,7 @@ const STATE = {
 ### Simple Oscillator
 
 ```javascript
-flux('sine', (mem, idx, sr) => {
+kanon('sine', (mem, idx, sr) => {
   // State layout
   const STATE = {
     PHASE: idx,
@@ -230,7 +230,7 @@ flux('sine', (mem, idx, sr) => {
 ### Complex Synth with Multiple Modules
 
 ```javascript
-flux('complex-synth', (mem, idx, sr) => {
+kanon('complex-synth', (mem, idx, sr) => {
   // State layout - organized by module
   const STATE = {
     // Oscillators (0-9)
@@ -305,7 +305,7 @@ flux('complex-synth', (mem, idx, sr) => {
 
 ```javascript
 // Signal A: Carrier
-flux('carrier', (mem, idx, sr) => {
+kanon('carrier', (mem, idx, sr) => {
   const STATE = {
     PHASE: idx,
     EXTERNAL_MOD_SLOT: 500,  // Read from signal B
@@ -329,7 +329,7 @@ flux('carrier', (mem, idx, sr) => {
 });
 
 // Signal B: Modulator (writes to slot 500)
-flux('modulator', (mem, idx, sr) => {
+kanon('modulator', (mem, idx, sr) => {
   const STATE = {
     PHASE: idx,
     OUTPUT_SLOT: 500,  // Write here for signal A to read
@@ -471,7 +471,7 @@ const STATE = {
 ### 4. Pre-Compute in Factory
 
 ```javascript
-flux('sine', (mem, idx, sr) => {
+kanon('sine', (mem, idx, sr) => {
   // ✅ Compute once in factory
   const freq = 440;
   const phaseInc = freq / sr;
@@ -583,22 +583,22 @@ update: () => {
 
 ```javascript
 // ❌ WRONG: Two signals, same indices
-flux('signal-a', (mem, idx) => {
+kanon('signal-a', (mem, idx) => {
   const STATE = { PHASE: idx };
   // Uses mem[idx]
 });
 
-flux('signal-b', (mem, idx) => {
+kanon('signal-b', (mem, idx) => {
   const STATE = { PHASE: idx };
   // Also uses mem[idx] - COLLISION!
 });
 
 // ✅ RIGHT: Hash gives different indices per ID
-flux('signal-a', (mem, idx) => {  // idx = hash('signal-a') = 237
+kanon('signal-a', (mem, idx) => {  // idx = hash('signal-a') = 237
   const STATE = { PHASE: idx };
 });
 
-flux('signal-b', (mem, idx) => {  // idx = hash('signal-b') = 419
+kanon('signal-b', (mem, idx) => {  // idx = hash('signal-b') = 419
   const STATE = { PHASE: idx };
 });
 ```
@@ -613,7 +613,7 @@ update: (sr) => {
 }
 
 // ✅ RIGHT: Pre-compute in factory
-flux('sine', (mem, idx, sr) => {
+kanon('sine', (mem, idx, sr) => {
   const phaseInc = 440 / sr;  // Once
 
   return {
@@ -674,7 +674,7 @@ update: () => {
 ### Template: Simple Signal
 
 ```javascript
-flux('my-signal', (mem, idx, sr) => {
+kanon('my-signal', (mem, idx, sr) => {
   // 1. State layout
   const STATE = {
     PHASE: idx,
@@ -700,7 +700,7 @@ flux('my-signal', (mem, idx, sr) => {
 ### Template: Complex Signal
 
 ```javascript
-flux('complex', (mem, idx, sr) => {
+kanon('complex', (mem, idx, sr) => {
   // 1. State layout (organized by module)
   const STATE = {
     // Module A (0-9)

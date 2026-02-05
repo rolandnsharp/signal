@@ -48,7 +48,7 @@ Speaker.js Setup:
 
 **Current best practice:**
 ```javascript
-flux('sine', (mem, idx, sr) => {
+kanon('sine', (mem, idx, sr) => {
   const phaseInc = 440 / sr;  // ← Computed ONCE
 
   return {
@@ -180,7 +180,7 @@ export function fastExpDecay(x) {
 ```javascript
 import { fastSin, fastCos, fastTanh } from './luts.js';
 
-flux('optimized-sine', (mem, idx, sr) => {
+kanon('optimized-sine', (mem, idx, sr) => {
   const phaseInc = 440 / sr;
 
   return {
@@ -191,7 +191,7 @@ flux('optimized-sine', (mem, idx, sr) => {
   };
 });
 
-flux('fm-optimized', (mem, idx, sr) => {
+kanon('fm-optimized', (mem, idx, sr) => {
   const carrierInc = 440 / sr;
   const modInc = 6 / sr;
 
@@ -216,7 +216,7 @@ flux('fm-optimized', (mem, idx, sr) => {
 ### Strategy 1: Compute Constants in Factory
 
 ```javascript
-flux('complex', (mem, idx, sr) => {
+kanon('complex', (mem, idx, sr) => {
   // ALL of this happens ONCE
   const freq1 = 440;
   const freq2 = 554.37;  // Perfect fifth
@@ -250,7 +250,7 @@ flux('complex', (mem, idx, sr) => {
 ### Strategy 2: Pre-Compute Filter Coefficients
 
 ```javascript
-flux('filtered', (mem, idx, sr) => {
+kanon('filtered', (mem, idx, sr) => {
   // Filter coefficients computed ONCE
   const cutoffHz = 1000;
   const omega = (TAU * cutoffHz) / sr;
@@ -292,7 +292,7 @@ flux('filtered', (mem, idx, sr) => {
 
 ```javascript
 // Pre-generate complex waveforms
-flux('wavetable', (mem, idx, sr) => {
+kanon('wavetable', (mem, idx, sr) => {
   // Generate wavetable ONCE
   const tableSize = 2048;
   const wavetable = new Float32Array(tableSize);
@@ -462,7 +462,7 @@ return [sample + triangularDither()];
 Prevent speaker damage from DC bias:
 
 ```javascript
-flux('dc-filter', (mem, idx, sr) => {
+kanon('dc-filter', (mem, idx, sr) => {
   // DC blocking filter
   const cutoff = 20;  // 20 Hz high-pass
   const alpha = 1 - (TAU * cutoff) / sr;
@@ -584,7 +584,7 @@ benchmarkSignal((mem, idx, sr) => ({
 ### Tier 1: Baseline (Current)
 
 ```javascript
-flux('baseline', (mem, idx, sr) => {
+kanon('baseline', (mem, idx, sr) => {
   const phaseInc = 440 / sr;
 
   return {
@@ -606,7 +606,7 @@ flux('baseline', (mem, idx, sr) => {
 ```javascript
 import { fastSin } from './luts.js';
 
-flux('optimized', (mem, idx, sr) => {
+kanon('optimized', (mem, idx, sr) => {
   const phaseInc = 440 / sr;
 
   return {
@@ -626,7 +626,7 @@ flux('optimized', (mem, idx, sr) => {
 ### Tier 3: Ultra (If Needed)
 
 ```javascript
-flux('ultra', (mem, idx, sr) => {
+kanon('ultra', (mem, idx, sr) => {
   const phaseInc = 440 / sr;
   const tableSize = 8192;
   const tableMask = tableSize - 1;
@@ -694,8 +694,8 @@ export function createOptimizedFM(carrierFreq, modFreq, modDepth) {
 }
 
 // Usage:
-flux('fast-sine', createOptimizedSine(440));
-flux('fast-fm', createOptimizedFM(440, 6, 100));
+kanon('fast-sine', createOptimizedSine(440));
+kanon('fast-fm', createOptimizedFM(440, 6, 100));
 ```
 
 ### Example 2: High-Performance Filter
@@ -767,7 +767,7 @@ export function createBiquadLP(cutoffHz, resonance) {
 // signals.js - Production-ready optimized synth
 import { fastSin, fastTanh } from './luts.js';
 
-flux('pro-synth', (mem, idx, sr) => {
+kanon('pro-synth', (mem, idx, sr) => {
   // State layout
   const STATE = {
     OSC1_PHASE: idx,

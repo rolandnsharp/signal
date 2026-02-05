@@ -7,10 +7,10 @@ Kanon treats parameters like **surgical variables** - numbers you can change liv
 ## How It Works
 
 ```javascript
-import { kanon, clear } from './flux.js';
+import { kanon, clear } from './kanon.js';
 clear(); // Remove old signals on hot-reload
 
-flux('my-signal', (mem, idx) => {
+kanon('my-signal', (mem, idx) => {
   // --- SURGERY PARAMS (change these live!) ---
   const freq = 220.0;
   const intensity = 5.0;
@@ -52,7 +52,7 @@ if (import.meta.hot) {
 
 ### 1. Group Parameters at the Top
 ```javascript
-flux('vortex', (mem, idx) => {
+kanon('vortex', (mem, idx) => {
   // --- SURGERY PARAMS ---
   const baseFreq = 110.0;      // Deep G2
   const modRatio = 1.618;      // Golden ratio
@@ -118,7 +118,7 @@ const intensity = 20.0; // Too much? Roll back
 
 **Use comments as presets:**
 ```javascript
-flux('vortex', (mem, idx) => {
+kanon('vortex', (mem, idx) => {
   // Preset: Gentle Cello
   // const baseFreq = 110.0, intensity = 3.0, morphSpeed = 0.1;
 
@@ -145,12 +145,12 @@ Run several signals simultaneously:
 ```javascript
 clear();
 
-flux('bass', (mem, idx) => {
+kanon('bass', (mem, idx) => {
   const freq = 55.0; // Low A
   // ...
 });
 
-flux('lead', (mem, idx) => {
+kanon('lead', (mem, idx) => {
   const freq = 440.0; // Concert A
   // ...
 });
@@ -160,7 +160,7 @@ All signals auto-mix via `Math.tanh()` soft-clipping in `kanon.js:updateAll()`.
 
 **To silence one:** Comment it out and save.
 ```javascript
-// flux('bass', ...)
+// kanon('bass', ...)
 // ^ Bass disappears on save
 ```
 
@@ -168,7 +168,7 @@ All signals auto-mix via `Math.tanh()` soft-clipping in `kanon.js:updateAll()`.
 
 Each signal gets persistent state via the `idx` parameter:
 ```javascript
-flux('my-signal', (mem, idx) => {
+kanon('my-signal', (mem, idx) => {
   // You have 3-4 slots typically (depends on hash collision)
   // mem[idx]     - First state variable (e.g., oscillator phase)
   // mem[idx + 1] - Second state variable (e.g., LFO phase)
@@ -249,7 +249,7 @@ Currently: Edit signals.js, save, hear changes.
 
 ```javascript
 // Starting point: Gentle sine wave
-flux('morph', (mem, idx) => {
+kanon('morph', (mem, idx) => {
   const freq = 220.0;
   const intensity = 0.0; // Pure sine
 

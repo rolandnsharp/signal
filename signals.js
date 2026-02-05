@@ -1,11 +1,11 @@
-// signals.js - Live Coding Interface (Flux Engine)
+// signals.js - Live Coding Interface (Kanon Engine)
 // ============================================================================
 // LIVE CODING: Edit this file while audio is playing for instant updates!
 // ============================================================================
-// Hot-reload compatible: Uses globalThis.FLUX_STATE for phase continuity
+// Hot-reload compatible: Uses globalThis.KANON_STATE for phase continuity
 // ============================================================================
 
-import { flux, clear } from './flux.js';
+import { kanon, clear } from './kanon.js';
 
 // Clear old signals on hot-reload (fixes commented-out signals continuing to play)
 clear();
@@ -15,7 +15,7 @@ clear();
 // ============================================================================
 // A pure sine wave whose volume breathes with an LFO
 
-// flux('breathing-sine', (state, idx) => {
+// kanon('breathing-sine', (state, idx) => {
 //   const carrierFreq = 220.0; // A3 note
 //   const lfoFreq = 0.5; // Breathe twice per second
 //   const lfoDepth = 0.7; // How much the volume changes
@@ -57,7 +57,7 @@ clear();
 
 
 
-// flux('vortex-morph474', (mem, idx) => {
+// kanon('vortex-morph474', (mem, idx) => {
 //   // --- SURGERY PARAMS (change these live!) ---
 //   const baseFreq = 222.0;    // Deep G2 note
 //   // const modRatio = 1.618;    // Golden Ratio (non-harmonic shimmer)
@@ -95,7 +95,7 @@ clear();
 
 
 
-// flux('vortex-333', (mem, idx) => {
+// kanon('vortex-333', (mem, idx) => {
 //   // --- SURGERY PARAMS (change these live!) ---
 //   const baseFreq = 444.0;    // Deep G2 note
 //   // const modRatio = 1.618;    // Golden Ratio (non-harmonic shimmer)
@@ -131,7 +131,7 @@ clear();
 //   };
 // });
 
-// flux('vortex-444', (mem, idx) => {
+// kanon('vortex-444', (mem, idx) => {
 //   // --- SURGERY PARAMS (change these live!) ---
 //   const baseFreq = 359.0;    // Deep G2 note
 //   const modRatio = 1.618;    // Golden Ratio (non-harmonic shimmer)
@@ -186,7 +186,7 @@ clear();
 //   return [x + dx * dt, y + dy * dt];
 // };
 
-// flux('van-der-pol', (mem, idx) => {
+// kanon('van-der-pol', (mem, idx) => {
 //   // --- SURGERY PARAMETERS ---
 //   // mu: 0.1 (sine-like) to 5.0 (aggressive/jagged)
 //   // dt: Controls pitch/speed (0.01 = very low, 0.15 = audio rate)
@@ -231,7 +231,7 @@ clear();
 //   return [x + dx * dt, y + dy * dt, z + dz * dt];
 // };
 
-// flux('lorenz-chaos', (mem, idx) => {
+// kanon('lorenz-chaos', (mem, idx) => {
 //   // Classic Lorenz parameters
 //   const params = { sigma: 10, rho: 28, beta: 8 / 3, dt: 0.005 };
 
@@ -266,7 +266,7 @@ clear();
 // ============================================================================
 // Classic FM synthesis for metallic, shimmering tones
 
-// flux('fm-vortex', (mem, idx) => {
+// kanon('fm-vortex', (mem, idx) => {
 //   const carrierFreq = 110.0; // Base frequency
 //   const modRatio = 1.618; // Golden ratio for organic shimmer
 //   const modIndex = 2.5; // Modulation depth
@@ -292,7 +292,7 @@ clear();
 // ============================================================================
 // 1. Change parameters (mu, dt, freq) and save - sound morphs instantly!
 // 2. Uncomment different examples to hear various oscillators
-// 3. Multiple flux() calls play simultaneously (each needs unique ID)
-// 4. State persists in globalThis.FLUX_STATE during hot-reload
+// 3. Multiple kanon() calls play simultaneously (each needs unique ID)
+// 4. State persists in globalThis.KANON_STATE during hot-reload
 // 5. All signals auto-mix and soft-clip via Math.tanh() in updateAll()
 // ============================================================================

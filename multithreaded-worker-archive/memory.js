@@ -68,7 +68,7 @@ export const sabData = new SharedArrayBuffer(RING_BUFFER_CAPACITY * STRIDE * 4);
 
 /**
  * Shared buffer for the DSP's persistent state.
- * This is the "memory" in `flux('name', (mem, idx) => ...)`.
+ * This is the "memory" in `kanon('name', (mem, idx) => ...)`.
  */
 export const sabState = new SharedArrayBuffer(STATE_BUFFER_SLOTS * 4); // Float32
 

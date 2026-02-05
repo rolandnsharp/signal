@@ -1,6 +1,6 @@
-// flux.js - The Flux Engine Registry (FRP Signal Management)
+// kanon.js - The Kanon Engine Registry (Phase-Continuous Signal Management)
 // ============================================================================
-// "The Flow" - Heraclitean Signal Surgery for Living Sound
+// "The Monochord" - Pythagorean Signal Surgery for Living Sound
 // ============================================================================
 
 import { STRIDE } from './storage.js';
@@ -10,12 +10,12 @@ import { STRIDE } from './storage.js';
 // ============================================================================
 
 // Persistent Float64Array for "Scientific Grade" phase precision
-globalThis.FLUX_STATE ??= new Float64Array(1024);
-const stateMemory = globalThis.FLUX_STATE;
+globalThis.KANON_STATE ??= new Float64Array(1024);
+const stateMemory = globalThis.KANON_STATE;
 
 // Signal registry (Map survives across hot-reloads in globalThis)
-globalThis.FLUX_REGISTRY ??= new Map();
-const registry = globalThis.FLUX_REGISTRY;
+globalThis.KANON_REGISTRY ??= new Map();
+const registry = globalThis.KANON_REGISTRY;
 
 // ============================================================================
 // Core API
@@ -27,7 +27,7 @@ const registry = globalThis.FLUX_REGISTRY;
  * @param {Function} factory - (state, idx) => { update: (sr) => [samples...] }
  * @returns {Object} - Signal object with update method
  */
-export function flux(id, factory) {
+export function kanon(id, factory) {
   // Simple hash for persistent index (deterministic across reloads)
   const idx = [...id].reduce((acc, char) => acc + char.charCodeAt(0), 0) % 512;
 

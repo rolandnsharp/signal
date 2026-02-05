@@ -22,7 +22,7 @@ This creates a resource conflict. The main thread is responsible for both real-t
 
 Using SharedArrayBuffer is the secret sauce:
 - **Zero-Copy:** The worker reads the new signal values directly from memory, meaning your "sound surgery" happens with microsecond latency.
-- **Phase Continuity:** The Main Thread re-parses your JS, but the Worker Thread keeps spinning, reading from the old memory until the Main Thread atomically updates the FLUX_STATE.
+- **Phase Continuity:** The Main Thread re-parses your JS, but the Worker Thread keeps spinning, reading from the old memory until the Main Thread atomically updates the KANON_STATE.
 - **Result:** Continuous sound, even if your code has a temporary syntax error during the reload.
 
 ### Critical Pro-Tip for 2026
@@ -305,7 +305,7 @@ The `export const` API created a philosophical shift:
 
 ### The Two Competing Architectures
 
-1. **The Original `flux()` API:** Incredibly expressive, truly live-patchable, but suffered from main-thread glitches. This is the one that feels musically profound.
+1. **The Original `kanon()` API:** Incredibly expressive, truly live-patchable, but suffered from main-thread glitches. This is the one that feels musically profound.
 2. **The Worker "Control Surface" API:** Rock-solid, glitch-free, but rigid and unexpressive.
 
 ### The Fundamental Challenge

@@ -1,5 +1,5 @@
 #!/usr/bin/env bun
-// index.js - Main Entry Point for Flux Engine
+// index.js - Main Entry Point for Kanon Engine
 // ============================================================================
 // Run with: bun --hot index.js
 // ============================================================================
@@ -14,8 +14,8 @@ import './signals.js';
 // ============================================================================
 
 console.log('='.repeat(60));
-console.log('FLUX - Live Sound Surgery Engine');
-console.log('Heraclitean Flow: Bun + Closures + SharedArrayBuffer');
+console.log('KANON - Live Sound Surgery Engine');
+console.log('Pythagorean Monochord: Bun + Closures + SharedArrayBuffer');
 console.log('='.repeat(60));
 console.log('');
 console.log('CONTROLS:');

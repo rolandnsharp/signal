@@ -424,7 +424,7 @@ if (backend === 'jack') {
 }
 
 // signals.js - UNCHANGED!
-flux('sine', (mem, idx, sr) => {
+kanon('sine', (mem, idx, sr) => {
   // Same code works with both backends
 });
 ```
@@ -700,7 +700,7 @@ await import('./signals.js');
 
 ```javascript
 // signals.js - SAME CODE for all backends
-flux('sine', (mem, idx, sr) => {
+kanon('sine', (mem, idx, sr) => {
   const phaseInc = 440 / sr;
   return {
     update: () => {
@@ -744,7 +744,7 @@ const BUFFER_SIZE = 65536;  // Larger buffer = more safety
 2. **Optimize producer:**
 ```javascript
 // Pre-compute more in factory, not in update
-flux('sine', (mem, idx, sr) => {
+kanon('sine', (mem, idx, sr) => {
   const phaseInc = 440 / sr;  // Computed once
   return { update: () => { /* fast path */ } };
 });
