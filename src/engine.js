@@ -20,6 +20,7 @@ const SAMPLE_RATE = 48000;
 
 let transport = null;
 let isRunning = false;
+let fillBufferHandle = null;
 
 // ============================================================================
 // Producer Loop (Filling the Well) - setImmediate for maximum throughput
@@ -38,8 +39,7 @@ function fillBuffer() {
   }
 
   // Yield to event loop, then immediately continue
-  // This creates a "saturation" loop that keeps buffer under high pressure
-  setImmediate(fillBuffer);
+  fillBufferHandle = setImmediate(fillBuffer);
 }
 
 // ============================================================================
@@ -50,8 +50,11 @@ function fillBuffer() {
  * Start the audio engine
  */
 export function start() {
-  if (isRunning) {
-    console.log('[Engine] Already running');
+  // Singleton Guard: If an engine is already running, do nothing.
+  // The hot-reload will have updated the registry, and the existing loop
+  // will pick up the changes seamlessly.
+  if (globalThis.KANON_ENGINE_INSTANCE) {
+    console.log('[Engine] Hot-reload: Engine already running.');
     return;
   }
 
@@ -73,7 +76,10 @@ export function start() {
 
   // Start producer loop (setImmediate for saturation)
   isRunning = true;
-  setImmediate(fillBuffer);
+  fillBufferHandle = setImmediate(fillBuffer);
+
+  // Store this instance globally
+  globalThis.KANON_ENGINE_INSTANCE = { stop };
 
   console.log(`[Engine] Running at ${SAMPLE_RATE}Hz, STRIDE=${ringBuffer.stride}`);
 }
@@ -86,13 +92,18 @@ export function stop() {
 
   console.log('[Engine] Stopping audio engine...');
 
-  isRunning = false; // This breaks the setImmediate loop
+  if (fillBufferHandle) {
+    clearImmediate(fillBufferHandle);
+    fillBufferHandle = null;
+  }
+  isRunning = false;
 
   if (transport) {
     transport.stop();
     transport = null;
   }
 
+  globalThis.KANON_ENGINE_INSTANCE = null;
   console.log('[Engine] Stopped');
 }
 

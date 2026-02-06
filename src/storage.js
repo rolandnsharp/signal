@@ -91,5 +91,13 @@ export const ringBuffer = {
     const w = Atomics.load(this.writeIdx, 0);
     const r = Atomics.load(this.readIdx, 0);
     return (w - r + this.size) % this.size;
+  },
+
+  /**
+   * Clear the buffer by resetting pointers
+   */
+  clear() {
+    Atomics.store(this.writeIdx, 0, 0);
+    Atomics.store(this.readIdx, 0, 0);
   }
 };
