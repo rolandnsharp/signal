@@ -7,10 +7,17 @@ import { fileURLToPath } from 'url';
 // Get the project root directory
 const projectRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
-// Run index.js with hot-reload
-const proc = spawn(['bun', '--hot', 'index.js'], {
+// Check if a session file was provided as an argument
+const sessionFile = process.argv[2] || 'live-session.js';
+
+// Run src/index.js with hot-reload, passing the session file as an env var
+const proc = spawn(['bun', '--hot', 'src/index.js'], {
   cwd: projectRoot,
   stdio: ['inherit', 'inherit', 'inherit'],
+  env: {
+    ...process.env,
+    KANON_SESSION: sessionFile,
+  },
 });
 
 await proc.exited;

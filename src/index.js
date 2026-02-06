@@ -7,7 +7,9 @@
 import { start, stop, status } from './src/engine.js';
 
 // Load signal definitions (live-codeable)
-import './live-session.js';
+// Use KANON_SESSION env var if provided, otherwise default to live-session.js
+const sessionFile = process.env.KANON_SESSION || './live-session.js';
+await import(sessionFile);
 
 // ============================================================================
 // Initialize
@@ -18,8 +20,10 @@ console.log('KANON - Live Sound Surgery Engine');
 console.log('Pythagorean Monochord: Bun + Closures + SharedArrayBuffer');
 console.log('='.repeat(60));
 console.log('');
+console.log(`Session: ${sessionFile}`);
+console.log('');
 console.log('CONTROLS:');
-console.log('  Edit live-session.js and save for instant hot-reload');
+console.log(`  Edit ${sessionFile} and save for instant hot-reload`);
 console.log('  Press Ctrl+C to stop');
 console.log('');
 

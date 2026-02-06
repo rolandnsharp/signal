@@ -20,15 +20,16 @@ bun install
 bun link
 
 # 3. Start the live sound surgery engine
-kanon
+kanon                    # Loads live-session.js (default)
+kanon my-session.js      # Load a custom session file
 
 # Alternative: Use bun scripts instead
 bun start
 
-# 4. Edit live-session.js while running for instant hot-reload!
+# 4. Edit your session file while running for instant hot-reload!
 ```
 
-The `kanon` command starts the engine with hot-reload enabled. Edit `live-session.js`, save, and hear your changes instantly with zero phase resets.
+The `kanon` command starts the engine with hot-reload enabled. Edit your session file, save, and hear your changes instantly with zero phase resets.
 
 ## Architecture
 
