@@ -423,7 +423,7 @@ if (backend === 'jack') {
   initSpeaker();
 }
 
-// signals.js - UNCHANGED!
+// live-session.js - UNCHANGED!
 kanon('sine', (mem, idx, sr) => {
   // Same code works with both backends
 });
@@ -607,7 +607,7 @@ Your `speaker.js` code works as-is!
 ### Step 1: Understand Your Current Stack
 
 ```
-Your Code (signals.js)
+Your Code (live-session.js)
     ↓
 Engine (engine.js)
     ↓
@@ -693,13 +693,13 @@ console.log(`Fluxwave running with ${backend} @ ${sampleRate}Hz`);
 startEngine(sampleRate);
 
 // Load signals (unchanged)
-await import('./signals.js');
+await import('./live-session.js');
 ```
 
 ### Step 4: User Changes Nothing!
 
 ```javascript
-// signals.js - SAME CODE for all backends
+// live-session.js - SAME CODE for all backends
 kanon('sine', (mem, idx, sr) => {
   const phaseInc = 440 / sr;
   return {

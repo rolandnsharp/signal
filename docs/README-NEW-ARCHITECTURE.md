@@ -18,7 +18,7 @@
 
 ```
 ┌─────────────────────────────────────────┐
-│  signals.js - Live Coding Interface     │  ← Edit this while running!
+│  live-session.js - Live Coding Interface     │  ← Edit this while running!
 ├─────────────────────────────────────────┤
 │  flux.js - Signal Registry (FRP)        │  ← Pure functional state transformers
 ├─────────────────────────────────────────┤
@@ -109,7 +109,7 @@ export const STRIDE = 1; // Easy to change later
 - **flux.js** - Signal registry & mixing (renamed from kanon.js)
 - **storage.js** - Ring buffer (SharedArrayBuffer)
 - **transport.js** - Audio output (speaker.js)
-- **signals.js** - **LIVE CODE HERE!** User-facing signal definitions
+- **live-session.js** - **LIVE CODE HERE!** User-facing signal definitions
 - **math-helpers.js** - Vector math utilities (optional)
 
 ## Deleted Files (No Longer Needed)

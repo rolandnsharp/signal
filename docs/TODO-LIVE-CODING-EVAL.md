@@ -4,7 +4,7 @@
 Implement a vim → flux evaluation system for true live coding workflow.
 
 ## Desired Workflow
-1. Edit `signals.js` in vim
+1. Edit `live-session.js` in vim
 2. Select a code block (visual mode: `vip` for paragraph)
 3. Press key combo (e.g., `<Leader>e` or `<Space>e`)
 4. Selected code is evaluated in running flux process
@@ -98,7 +98,7 @@ echo "kanon('test', ...)" > /tmp/kanon-eval
 
 ## Testing Plan
 1. Start kanon with eval server: `bun --hot --eval-server index.js`
-2. Open signals.js in vim
+2. Open live-session.js in vim
 3. Select a kanon() definition
 4. Press `<Leader>e`
 5. Verify sound changes without file save

@@ -7,7 +7,7 @@
 import { start, stop, status } from './src/engine.js';
 
 // Load signal definitions (live-codeable)
-import './signals.js';
+import './live-session.js';
 
 // ============================================================================
 // Initialize
@@ -19,7 +19,7 @@ console.log('Pythagorean Monochord: Bun + Closures + SharedArrayBuffer');
 console.log('='.repeat(60));
 console.log('');
 console.log('CONTROLS:');
-console.log('  Edit signals.js and save for instant hot-reload');
+console.log('  Edit live-session.js and save for instant hot-reload');
 console.log('  Press Ctrl+C to stop');
 console.log('');
 

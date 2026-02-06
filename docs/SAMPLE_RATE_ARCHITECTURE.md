@@ -7,7 +7,7 @@
 ### How It Works Now
 
 ```javascript
-// signals.js
+// live-session.js
 kanon('sine', (mem, idx) => ({
   update: (sr) => {
     //      ^^-- Sample rate passed 48,000 times/second
@@ -30,7 +30,7 @@ kanon('sine', (mem, idx) => ({
 ### Factory Pattern with Pre-Computed Phase Increment
 
 ```javascript
-// signals.js
+// live-session.js
 kanon('sine', (mem, idx, sr) => {
   //                       ^^-- Sample rate passed ONCE to factory
   const phaseInc = 440 / sr;  // Division computed ONCE
@@ -143,7 +143,7 @@ export function kanon(id, factory) {
 ```
 
 ```javascript
-// signals.js - User code never changes!
+// live-session.js - User code never changes!
 kanon('sine', (mem, idx, sr) => {
   const phaseInc = 440 / sr;  // sr automatically set by backend
   return {
@@ -163,7 +163,7 @@ $ bun index.js
 # JACK
 $ AUDIO_BACKEND=jack bun index.js
 
-# signals.js stays the same!
+# live-session.js stays the same!
 ```
 
 ---
@@ -252,7 +252,7 @@ export function kanon(id, factory) {
   registry.set(id, signal);
 }
 
-// signals.js (unchanged)
+// live-session.js (unchanged)
 kanon('sine', (mem, idx, sr) => {
   const phaseInc = 440 / sr;
   return { update: () => { /* ... */ } };
@@ -339,7 +339,7 @@ kanon('fm-synth', (mem, idx, sr) => {
    - Import `SAMPLE_RATE` from transport
    - Pass to factory, not update
 
-3. **signals.js unchanged:**
+3. **live-session.js unchanged:**
    - User code stays the same
    - Works with any backend
 

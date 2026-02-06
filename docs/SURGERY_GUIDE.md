@@ -24,7 +24,7 @@ kanon('my-signal', (mem, idx) => {
 ```
 
 **On every save:**
-1. Bun reloads `signals.js`
+1. Bun reloads `live-session.js`
 2. `clear()` removes old signal definitions
 3. New `kanon()` calls register fresh closures with updated parameters
 4. Phase state persists in `globalThis.KANON_STATE` (no clicks!)
@@ -97,7 +97,7 @@ const param1 = 5.0; // Meaningless
 
 ### Typical Session
 1. Start kanon: `bun --hot index.js`
-2. Open `signals.js` in vim/editor
+2. Open `live-session.js` in vim/editor
 3. Edit a parameter (e.g., `intensity = 6.0` → `intensity = 12.0`)
 4. Save (`:w`)
 5. **Hear it morph instantly**
@@ -237,7 +237,7 @@ const attackTime = 0.1;     // Envelope attack (seconds)
 
 ## Future: Vim Integration
 
-Currently: Edit signals.js, save, hear changes.
+Currently: Edit live-session.js, save, hear changes.
 
 **Coming soon** (see TODO-LIVE-CODING-EVAL.md):
 - Visual-select code in vim

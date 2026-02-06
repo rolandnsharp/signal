@@ -19,14 +19,14 @@ bun install
 # Start the engine (with hot-reload)
 bun --hot index.js
 
-# Edit signals.js while running for live surgery!
+# Edit live-session.js while running for live surgery!
 ```
 
 ## Architecture
 
 ```
 ┌───────────────────────────────────────────┐
-│  signals.js - Live Coding Interface       │  ← Edit this!
+│  live-session.js - Live Coding Interface       │  ← Edit this!
 ├───────────────────────────────────────────┤
 │  kanon.js - Signal Registry (FRP)         │  ← State transformers
 ├───────────────────────────────────────────┤
@@ -170,14 +170,14 @@ kanon('van-der-pol', (mem, idx) => {
 ## Live Surgery Workflow
 
 1. **Start Kanon**: `bun --hot index.js`
-2. **Open** `signals.js` in your editor
+2. **Open** `live-session.js` in your editor
 3. **Edit** a parameter (e.g., `intensity = 6.0` → `intensity = 12.0`)
 4. **Save** (`:w` in Vim)
 5. **Hear it morph instantly** with zero discontinuity
 
 ### Why It Works
 
-When you save `signals.js`:
+When you save `live-session.js`:
 1. Bun reloads the module
 2. The old signal registry is cleared
 3. New `kanon()` calls register fresh closures with updated parameters
@@ -241,7 +241,7 @@ Remove a specific signal by ID.
 - **kanon.js** - Signal registry & mixing logic
 - **storage.js** - Ring buffer (SharedArrayBuffer)
 - **transport.js** - Audio output (speaker.js)
-- **signals.js** - **YOUR CODE** - Live-codeable signal definitions
+- **live-session.js** - **YOUR CODE** - Live-codeable signal definitions
 - **math-helpers.js** - Vector math utilities (optional)
 
 ## Technical Details

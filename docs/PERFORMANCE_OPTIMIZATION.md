@@ -813,7 +813,7 @@ export function createBiquadLP(cutoffHz, resonance) {
 ### Example 3: Complete Optimized Synth
 
 ```javascript
-// signals.js - Production-ready optimized synth
+// live-session.js - Production-ready optimized synth
 import { fastSin, fastTanh } from './luts.js';
 
 kanon('pro-synth', (mem, idx, sr) => {
@@ -906,7 +906,7 @@ kanon('pro-synth', (mem, idx, sr) => {
 # 1. Add lookup tables
 $ cp examples/luts.js ./luts.js
 
-# 2. Import in signals.js
+# 2. Import in live-session.js
 import { fastSin, fastCos } from './luts.js';
 
 # 3. Replace Math.sin with fastSin

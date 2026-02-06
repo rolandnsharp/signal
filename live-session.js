@@ -1,4 +1,4 @@
-// signals.js - Live Coding Interface (Kanon Engine)
+// live-session.js - Live Coding Interface (Kanon Engine)
 // ============================================================================
 // LIVE CODING: Edit this file while audio is playing for instant updates!
 // ============================================================================

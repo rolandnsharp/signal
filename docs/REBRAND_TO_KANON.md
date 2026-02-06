@@ -34,7 +34,7 @@ git commit -m "Backup before Kanon rebrand"
 [ -f flux.js ] && mv flux.js kanon.js
 [ -f flux.ts ] && mv flux.ts kanon.ts
 
-# No other files need renaming (signals.js, engine.js, etc. stay the same)
+# No other files need renaming (live-session.js, engine.js, etc. stay the same)
 ```
 
 ### Step 3: Find and Replace in Code
@@ -203,7 +203,7 @@ After running the script, manually check:
 
 ### Files to Review:
 - [ ] `kanon.js` (was flux.js) - function is `export function kanon`
-- [ ] `signals.js` - calls are `kanon('name', ...)`
+- [ ] `live-session.js` - calls are `kanon('name', ...)`
 - [ ] `engine.js` - imports `import { kanon }`
 - [ ] `index.js` - any references updated
 - [ ] `package.json` - name is "kanon"

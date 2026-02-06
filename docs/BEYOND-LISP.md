@@ -367,7 +367,7 @@ In many Lisp environments, re-evaluating code can reset local state unless you:
 ```javascript
 import { kanon, clear } from './kanon.js';
 
-// Single line at top of signals.js
+// Single line at top of live-session.js
 clear(); // Remove all old signal definitions
 
 kanon('vortex-morph', (mem, idx) => {
