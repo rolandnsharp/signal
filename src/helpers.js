@@ -79,32 +79,32 @@ export const lfo = (freq) => (state, idx, sampleRate) => {
 // ============================================================================
 
 // Multiply signal by a constant (amplitude/gain)
-export const gain = (amount) => (upstream) => (state, idx) => {
-  const up = upstream(state, idx);
+export const gain = (amount) => (upstream) => (state, idx, sampleRate) => {
+  const up = upstream(state, idx, sampleRate);
   return {
     update: () => up.update().map(s => s * amount)
   };
 };
 
 // Add a constant offset to signal
-export const offset = (amount) => (upstream) => (state, idx) => {
-  const up = upstream(state, idx);
+export const offset = (amount) => (upstream) => (state, idx, sampleRate) => {
+  const up = upstream(state, idx, sampleRate);
   return {
     update: () => up.update().map(s => s + amount)
   };
 };
 
 // Hard clip signal to range [-1, 1]
-export const clip = () => (upstream) => (state, idx) => {
-  const up = upstream(state, idx);
+export const clip = () => (upstream) => (state, idx, sampleRate) => {
+  const up = upstream(state, idx, sampleRate);
   return {
     update: () => up.update().map(s => Math.max(-1, Math.min(1, s)))
   };
 };
 
 // Soft clip using tanh
-export const softClip = () => (upstream) => (state, idx) => {
-  const up = upstream(state, idx);
+export const softClip = () => (upstream) => (state, idx, sampleRate) => {
+  const up = upstream(state, idx, sampleRate);
   return {
     update: () => up.update().map(s => Math.tanh(s))
   };
@@ -115,9 +115,9 @@ export const softClip = () => (upstream) => (state, idx) => {
 // ============================================================================
 
 // Mix multiple signals together (sum)
-export const mix = (...signals) => (state, idx) => {
+export const mix = (...signals) => (state, idx, sampleRate) => {
   // Allocate state slots for each signal
-  const sources = signals.map((sig, i) => sig(state, idx + i));
+  const sources = signals.map((sig, i) => sig(state, idx + i, sampleRate));
 
   return {
     update: () => {
@@ -142,8 +142,8 @@ export const add = (signalA, signalB) => mix(signalA, signalB);
 // ============================================================================
 
 // Pan a mono signal to stereo (pan: 0=left, 0.5=center, 1=right)
-export const pan = (panPos) => (upstream) => (state, idx) => {
-  const up = upstream(state, idx);
+export const pan = (panPos) => (upstream) => (state, idx, sampleRate) => {
+  const up = upstream(state, idx, sampleRate);
   return {
     update: () => {
       const [mono] = up.update();
@@ -155,9 +155,9 @@ export const pan = (panPos) => (upstream) => (state, idx) => {
 };
 
 // Combine two mono signals into stereo
-export const stereo = (leftSig, rightSig) => (state, idx) => {
-  const left = leftSig(state, idx);
-  const right = rightSig(state, idx + 1);
+export const stereo = (leftSig, rightSig) => (state, idx, sampleRate) => {
+  const left = leftSig(state, idx, sampleRate);
+  const right = rightSig(state, idx + 1, sampleRate);
 
   return {
     update: () => {
@@ -169,8 +169,8 @@ export const stereo = (leftSig, rightSig) => (state, idx) => {
 };
 
 // Convert stereo to mono (mix down)
-export const mono = () => (upstream) => (state, idx) => {
-  const up = upstream(state, idx);
+export const mono = () => (upstream) => (state, idx, sampleRate) => {
+  const up = upstream(state, idx, sampleRate);
   return {
     update: () => {
       const signal = up.update();
@@ -183,8 +183,8 @@ export const mono = () => (upstream) => (state, idx) => {
 };
 
 // Duplicate mono to stereo
-export const spread = () => (upstream) => (state, idx) => {
-  const up = upstream(state, idx);
+export const spread = () => (upstream) => (state, idx, sampleRate) => {
+  const up = upstream(state, idx, sampleRate);
   return {
     update: () => {
       const [mono] = up.update();
@@ -198,9 +198,9 @@ export const spread = () => (upstream) => (state, idx) => {
 // ============================================================================
 
 // Amplitude modulation (multiply two signals)
-export const am = (modulator) => (carrier) => (state, idx) => {
-  const mod = modulator(state, idx);
-  const car = carrier(state, idx + 1);
+export const am = (modulator) => (carrier) => (state, idx, sampleRate) => {
+  const mod = modulator(state, idx, sampleRate);
+  const car = carrier(state, idx + 1, sampleRate);
 
   return {
     update: () => {
