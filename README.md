@@ -1,381 +1,300 @@
-# Aither - Multi-Paradigm Live Coding Engine
+# Aither (αἰθήρ)
 
-> *"All things are number."* - Pythagoras
+> *"One interface. Five paradigms. Infinite expression."*
 
-A multi-paradigm live-coding environment for sound synthesis. Edit JavaScript, save, and hear changes instantly with **zero phase resets**. True surgical manipulation of living sound across five fundamental synthesis paradigms.
+**Aither** is a live coding audio synthesis engine with a unified `f(s)` interface that supports five expressive paradigms, from pure mathematics to spatial sound fields.
 
 ## Philosophy
 
-**Aither** (Gr. αἰθήρ) embodies the classical element that fills the universe, the pure essence that conveys all phenomena. Like the theoretical medium through which waves propagate, this engine treats your state array as the fabric of a sonic universe that never stops.
+The five paradigms aren't separate APIs—they're **expressive styles** that emerge from a single universal interface:
 
-When you edit parameters, the sonic medium morphs seamlessly because its state persists across code changes. The monochord's string continues vibrating; only the tension changes.
+```javascript
+f(s) → sample
+```
 
-**See [docs/AETHER_PARADIGMS.md](docs/AETHER_PARADIGMS.md) for the full design philosophy and the Five Elements.**
+Where `s` is the universe state containing everything a signal needs: time, sample rate, persistent state, and spatial position.
 
-## The Five Paradigms (Arche)
+## The Five Paradigms
 
-Aither supports five fundamental synthesis paradigms, each representing a different level of abstraction:
+| Paradigm | Element | Uses | Style |
+|----------|---------|------|-------|
+| **Kanon** | Fire 🔥 | `s.t` | Pure time functions |
+| **Rhythmos** | Earth 🌍 | `s.state`, `s.sr` | Explicit state (oscillators) |
+| **Atomos** | Air 💨 | `s.state`, `s.dt` | Discrete processes (granular) |
+| **Physis** | Water 💧 | `s.dt` | Physics simulation (springs) |
+| **Chora** | Aither ✨ | `s.position`, `s.t` | Spatial synthesis (fields) |
 
-| Paradigm | Element | Signature | Concept |
-|----------|---------|-----------|---------|
-| **Rhythmos** | Earth 🌍 | `f(state, sr)` | Explicit state management |
-| **Kanon** | Fire 🔥 | `f(t)` | Pure functions of time |
-| **Atomos** | Air 💨 | `f(state, dt)` | Discrete generative processes |
-| **Physis** | Water 💧 | `flow(state)` | Physics simulation |
-| **Chora** | Aither ✨ | `field(state)` | Spatial resonance fields |
-
-Currently, **Rhythmos** is fully implemented. The others are coming soon.
+All five work together seamlessly because they share the same signature.
 
 ## Quick Start
 
 ```bash
-# 1. Install dependencies
+# Install dependencies
 bun install
 
-# 2. Link commands globally (one-time setup)
+# Link globally (one-time)
 bun link
 
-# 3. Start the live sound engine in a terminal
-aether                    # Loads live-session.js (default)
-aether my-session.js      # Load a custom session file
+# Start the server
+aither start
 
-# 4. In a separate terminal, send commands or start a REPL
-aether-client send my-session.js  # Send a whole file
-aether-client repl                # Start an interactive REPL
+# In another terminal, open the REPL
+aither repl
 
-# The traditional hot-reload method still works too:
-bun --hot src/index.js
+# Or send a file
+aither send snippet.js
 ```
 
-The `aether` command starts the server. You can then interact with it using `aether-client` for surgical code injection, or rely on Bun's hot-reloading by editing your session file.
+## Basic Examples
+
+### Kanon (Fire 🔥) - Pure Time
+
+```javascript
+// Pure sine wave - only uses time
+play('pure', s => Math.sin(2 * Math.PI * 440 * s.t) * 0.3);
+```
+
+### Rhythmos (Earth 🌍) - Explicit State
+
+```javascript
+// Phase accumulation oscillator
+play('osc', s => {
+  s.state[0] = (s.state[0] + 440 / s.sr) % 1.0;
+  return Math.sin(s.state[0] * 2 * Math.PI) * 0.3;
+});
+```
+
+### Using DSP Helpers
+
+```javascript
+// Compose with helpers
+play('filtered',
+  pipe(
+    s => Math.sin(2 * Math.PI * 440 * s.t),
+    lowpass(_, 800),
+    tremolo(_, 5, 0.8),
+    gain(_, 0.5)
+  )
+);
+```
+
+### Chora (Aither ✨) - Spatial Synthesis
+
+```javascript
+// Sound that changes with position in space
+play('spatial', s => {
+  const { x, y, z } = s.position;
+  const distance = Math.sqrt(x*x + y*y + z*z);
+  const amplitude = 1 / (distance + 1);
+  return Math.sin(2 * Math.PI * 440 * s.t) * amplitude * 0.3;
+});
+
+// Move through the field
+setPosition({ x: 2, y: 1, z: 0 });
+```
+
+## Commands
+
+### Server
+```bash
+aither start              # Start audio server
+```
+
+### REPL
+```bash
+aither repl               # Interactive REPL
+aither send file.js       # Send file to server
+aither help               # Show help
+```
+
+### Core API
+```javascript
+play(name, signal)        // Start a signal (alias: register)
+stop(name)                // Stop a signal (alias: unregister)
+clear()                   // Stop all signals
+setPosition({x, y, z})    // Set listener position (for Chora)
+```
+
+### DSP Helpers
+```javascript
+// All helpers work on any paradigm!
+pipe(...fns)              // Compose functions left-to-right
+mix(...signals)           // Mix multiple signals
+lowpass(signal, cutoff)   // Lowpass filter
+tremolo(sig, rate, depth) // Amplitude modulation
+delay(sig, maxTime, time) // Delay line
+feedback(sig, max, time, fb) // Feedback delay
+gain(signal, amount)      // Amplification
+pan(signal, position)     // Stereo panning (-1 to 1)
+```
+
+## The Universe State (`s`)
+
+Every signal receives the universe state:
+
+```javascript
+s = {
+  t: 0,              // Absolute time (seconds)
+  dt: 1/48000,       // Time delta (1/sampleRate)
+  sr: 48000,         // Sample rate
+  idx: 0,            // Sample index in buffer
+  position: {x,y,z}, // Listener position (Chora)
+  name: "signal",    // Signal name (for state keys)
+  state: Float64Array(128) // Persistent state memory
+}
+```
 
 ## Architecture
 
 ```
-┌───────────────────────────────────────────┐
-│  live-session.js - Live Coding Interface  │  ← Edit this!
-├───────────────────────────────────────────┤
-│  src/arche/                               │
-│    ├── rhythmos/ (Earth 🌍)              │  ← Paradigm modules
-│    ├── kanon/ (Fire 🔥)                  │
-│    ├── atomos/ (Air 💨)                  │
-│    ├── physis/ (Water 💧)                │
-│    └── chora/ (Aither ✨)                │
-├───────────────────────────────────────────┤
-│  aether.js - Signal Registry              │  ← Paradigm-agnostic mixer
-├───────────────────────────────────────────┤
-│  storage.js - Ring Buffer (The Well)      │  ← SharedArrayBuffer
-├───────────────────────────────────────────┤
-│  transport.js - Audio Sink                │  ← Speaker.js → JACK FFI
-├───────────────────────────────────────────┤
-│  engine.js - Producer Loop                │  ← setImmediate saturation
-└───────────────────────────────────────────┘
+┌─────────────────────────────────────┐
+│  aither CLI                         │  Commands: start, repl, send
+├─────────────────────────────────────┤
+│  server.js                          │  Audio engine + REPL server
+│  ├─ Signal registry                │  Manages active signals
+│  ├─ REPL server (UDP)              │  Port 41234
+│  └─ Audio generation loop          │  Calls f(s) for each sample
+├─────────────────────────────────────┤
+│  dsp.js                             │  Universal helpers
+│  ├─ expand() pattern               │  Stride-agnostic multichannel
+│  └─ Implicit state management      │  Automatic persistence
+├─────────────────────────────────────┤
+│  speaker.js                         │  Audio output (speaker module)
+└─────────────────────────────────────┘
 ```
 
-### Key Features
+## Key Features
 
-- **Phase Continuity**: State persists in `globalThis.AETHER_STATE` during hot-reload
-- **Multi-Paradigm**: Mix Earth (Rhythmos), Fire (Kanon), Air (Atomos), Water (Physis), and Aither (Chora)
-- **Zero-Copy Architecture**: `subarray()` eliminates GC pauses
-- **Soft Clipping**: All signals auto-clipped with `Math.tanh()` for safety
-- **48kHz @ 32-bit float**: Native floating-point audio (no int16 quantization)
-- **Stereo Support**: STRIDE=2 for full stereo output
-- **Context-Based Updates**: All paradigms receive `{t, dt, sampleRate}` context
+✨ **Unified Interface** - One `f(s)` signature for all paradigms
+🎯 **Universal Helpers** - Same DSP works on pure functions, physics, spatial fields
+🔥 **Zero-GC Hot Path** - No allocations in real-time audio loop
+🌊 **Phase Continuity** - State persists across live edits
+🎚️ **Stride-Agnostic** - Mono, stereo, N-channel automatic
+💨 **REPL-Driven** - Surgical code injection while running
+✨ **Spatial Synthesis** - True wavefield synthesis (Chora paradigm)
 
-## Basic Usage (Rhythmos Paradigm)
+## Live Coding Workflow
 
-### Simple Sine Wave
-
-```javascript
-import { Rhythmos } from './src/arche/rhythmos/index.js';
-
-Rhythmos.register('carrier',
-  Rhythmos.pipe(
-    Rhythmos.sin(440),  // Change this and save - NO CLICKS!
-    Rhythmos.gain(0.3)
-  )
-);
+### 1. Start the server
+```bash
+aither start
 ```
 
-### Stereo Panning
-
-```javascript
-Rhythmos.register('panned-sine',
-  Rhythmos.pipe(
-    Rhythmos.sin(330),
-    Rhythmos.gain(0.4),
-    Rhythmos.pan(0.75)  // Pan to the right
-  )
-);
+### 2. Connect with REPL
+```bash
+aither repl
 ```
 
-### Binaural Beat
-
+### 3. Live code!
 ```javascript
-Rhythmos.register('binaural',
-  Rhythmos.stereo(
-    Rhythmos.pipe(Rhythmos.sin(432), Rhythmos.gain(0.3)),  // Left
-    Rhythmos.pipe(Rhythmos.sin(434), Rhythmos.gain(0.3))   // Right (2Hz beat)
-  )
-);
+aither> play('test', s => Math.sin(2 * Math.PI * 440 * s.t) * 0.3)
+aither> stop('test')
+aither> clear()
 ```
 
-### Complex Modulation
-
-```javascript
-Rhythmos.register('tremolo',
-  Rhythmos.pipe(
-    Rhythmos.am(
-      Rhythmos.lfo(4)       // 4 Hz modulator
-    )(
-      Rhythmos.sin(440)     // 440 Hz carrier
-    ),
-    Rhythmos.gain(0.5)
-  )
-);
+### 4. Or send files
+```bash
+aither send my-session.js
 ```
 
-### Manual API (Advanced)
+## File Structure
 
-For more control, you can use the lower-level factory API:
+```
+aither/
+├── src/
+│   ├── cli.js          # Command-line interface
+│   ├── server.js       # Audio engine + REPL server
+│   ├── dsp.js          # DSP helpers (filters, effects)
+│   ├── speaker.js      # Audio output
+│   ├── repl.js         # Interactive REPL client
+│   └── send-repl.js    # File sender client
+├── docs/               # Documentation
+│   ├── CORE_VISION.md  # Fundamental principles
+│   ├── HELPERS.md      # DSP helper guide
+│   └── ...
+├── live-session.js     # Example startup script
+└── package.json
+```
+
+## Examples Repository
+
+Check out `live-session.js` for working examples:
+- Simple oscillators
+- Filtered signals
+- Tremolo effects
+- Panning and stereo
+- Composable signal chains
+
+## Advanced: Mixing Paradigms
+
+The power of Aither is mixing all five paradigms in one composition:
 
 ```javascript
-Rhythmos.register('vortex-morph', (mem, idx, sampleRate) => {
-  // Your parameters
-  const baseFreq = 110.0;
-  const modRatio = 1.618;
-  const morphSpeed = 0.2;
-  const intensity = 6.0;
+play('hybrid',
+  mix(
+    // Kanon (Fire) - Pure time
+    s => Math.sin(2 * Math.PI * 440 * s.t),
 
-  return {
-    update: (context) => {
-      // Accumulate three phases
-      let p1 = mem[idx];         // Carrier
-      let p2 = mem[idx + 1];     // Modulator
-      let t  = mem[idx + 2];     // LFO
+    // Rhythmos (Earth) - Stateful oscillator
+    s => {
+      s.state[0] = (s.state[0] + 220 / s.sr) % 1.0;
+      return Math.sin(s.state[0] * 2 * Math.PI);
+    },
 
-      p1 = (p1 + baseFreq / sampleRate) % 1.0;
-      p2 = (p2 + (baseFreq * modRatio) / sampleRate) % 1.0;
-      t  = (t + morphSpeed / sampleRate) % 1.0;
-
-      mem[idx] = p1;
-      mem[idx + 1] = p2;
-      mem[idx + 2] = t;
-
-      // Phase modulation
-      const depthLFO = Math.sin(t * 2 * Math.PI) * intensity;
-      const modulator = Math.sin(p2 * 2 * Math.PI) * depthLFO;
-      const sample = Math.sin(p1 * 2 * Math.PI + modulator);
-
-      return [sample * 0.5];
+    // Chora (Aither) - Spatial field
+    s => {
+      const { x, y, z } = s.position;
+      const d = Math.sqrt(x*x + y*y + z*z);
+      return Math.sin(2 * Math.PI * 110 * s.t) / (d + 1);
     }
-  };
-});
+  )
+);
 ```
 
-## Live Surgery Workflows
-
-Aither supports two primary workflows for live code manipulation.
-
-### Method 1: Interactive REPL (Recommended)
-
-This method uses `aether-client` to send small, surgical code snippets to the running server.
-
-1.  **Start Server**: In one terminal, run `aether`.
-2.  **Start REPL**: In a second terminal, run `aether-client repl`.
-3.  **Evaluate Code**: Type JavaScript code into the REPL and press Enter.
-
-```
-aether> import { Rhythmos } from './src/arche/rhythmos/index.js';
-Sent successfully.
-aether> Rhythmos.register('noise', () => ({ update: () => [Math.random() * 0.1] }))
-Sent successfully.
-aether> import { clear } from './src/aether.js'; clear()
-Sent successfully.
-```
-
-You can also send an entire file: `aether-client send my-session.js`.
-
-### Method 2: File-Based Hot-Reload
-
-Classic workflow, powered by Bun's `--hot` flag.
-
-1.  **Start Aither with Hot-Reload**: `bun --hot src/index.js`
-2.  **Open** `live-session.js` in your editor.
-3.  **Edit** a parameter (e.g., `Rhythmos.sin(440)` → `Rhythmos.sin(550)`).
-4.  **Save** (`:w` in Vim).
-5.  **Hear it morph instantly** with zero discontinuity.
-
-### Why It Works
-
-When you send code via the REPL or save a file with hot-reload:
-1.  The new code is evaluated.
-2.  The signal registry is updated with new closures.
-3.  **State in `globalThis.AETHER_STATE` is untouched.**
-4.  The audio signal continues from its exact phase position, but with new parameters.
-
-This is **phase-continuous hot-swapping** - like adjusting a monochord's string tension while it's still vibrating.
-
-## State Management
-
-### Persistent State Buffer
+Then apply the same helper to all of them:
 
 ```javascript
-globalThis.AETHER_STATE ??= new Float64Array(1024);
+play('filtered-hybrid',
+  pipe(
+    mix(kanon, rhythmos, chora),
+    lowpass(_, 1200),
+    gain(_, 0.3)
+  )
+);
 ```
-
-Each signal gets a deterministic slot via string hash. Your state survives hot-reload, which is why oscillators don't click or reset phase when you change parameters.
-
-## Rhythmos API Reference
-
-### Registration
-
-```javascript
-Rhythmos.register(id, factory)
-```
-
-### Oscillators
-
-- `Rhythmos.sin(freq)` - Sine wave
-- `Rhythmos.saw(freq)` - Sawtooth
-- `Rhythmos.square(freq)` - Square wave
-- `Rhythmos.tri(freq)` - Triangle wave
-- `Rhythmos.lfo(freq)` - Low-frequency oscillator (0-1 range)
-
-### Processors
-
-- `Rhythmos.gain(amount)` - Multiply signal
-- `Rhythmos.offset(amount)` - Add constant
-- `Rhythmos.clip()` - Hard clip to [-1, 1]
-- `Rhythmos.softClip()` - Soft clip with tanh
-
-### Stereo
-
-- `Rhythmos.pan(position)` - Pan mono to stereo (0=left, 1=right)
-- `Rhythmos.stereo(leftSig, rightSig)` - Combine two mono signals
-- `Rhythmos.mono()` - Mix down to mono
-- `Rhythmos.spread()` - Duplicate mono to stereo
-
-### Mixing
-
-- `Rhythmos.mix(...signals)` - Mix multiple signals
-- `Rhythmos.add(sigA, sigB)` - Add two signals
-
-### Modulation
-
-- `Rhythmos.am(modulator)(carrier)` - Amplitude modulation
-
-### Effects
-
-- `Rhythmos.feedback(delayTime, feedbackAmt)` - Delay with feedback
-
-### Composition
-
-- `Rhythmos.pipe(...functions)` - Left-to-right composition
-- `Rhythmos.compose(...functions)` - Right-to-left composition
-
-## Core API
-
-These functions are available from `aether.js`:
-
-### `clear()`
-Remove all registered signals.
-
-### `list()`
-Get array of all registered signal IDs.
-
-### `remove(id)`
-Remove a specific signal by ID.
-
-## Files
-
-- **src/index.js** - Entry point
-- **src/engine.js** - Producer loop, lifecycle management
-- **src/aether.js** - Paradigm-agnostic signal registry & mixer
-- **src/storage.js** - Ring buffer (SharedArrayBuffer)
-- **src/transport.js** - Audio output (speaker.js)
-- **src/arche/** - Paradigm-specific modules
-  - **rhythmos/** - Earth 🌍 (explicit state)
-  - **kanon/** - Fire 🔥 (pure time functions) - *Coming soon*
-  - **atomos/** - Air 💨 (discrete processes) - *Coming soon*
-  - **physis/** - Water 💧 (physics simulation) - *Coming soon*
-  - **chora/** - Aither ✨ (spatial fields) - *Coming soon*
-- **live-session.js** - **YOUR CODE** - Live-codeable signal definitions
-
-## Technical Details
-
-- **Runtime**: Bun with `--hot` flag for hot-reload
-- **Audio**: speaker.js (48kHz @ 32-bit float, stereo)
-- **State Memory**: Float64Array (1024 slots, sub-sample precision)
-- **Ring Buffer**: SharedArrayBuffer (32768 frames, ~680ms @ 48kHz)
-- **Producer Loop**: `setImmediate` saturation for maximum throughput
-- **Soft Clipping**: `Math.tanh()` on mixed output
-- **Context Passing**: All signals receive `{t, dt, sampleRate}` for paradigm flexibility
-
-## Why This Architecture?
-
-### The Multi-Paradigm Vision
-
-Different musical ideas require different levels of abstraction:
-- **Rhythmos** (Earth) - Solid, predictable oscillators and envelopes
-- **Kanon** (Fire) - Pure mathematical beauty
-- **Atomos** (Air) - Generative, emergent textures
-- **Physis** (Water) - Organic, physically-modeled instruments
-- **Chora** (Aither) - Spatial acoustics and reverb
-
-Aither lets you use all five together in a single composition.
-
-### The Monochord Philosophy
-
-Pythagoras discovered that harmony is mathematical using the monochord - a single vibrating string:
-- Divide at 1:2 = Octave
-- Divide at 2:3 = Perfect Fifth
-- Divide at 3:4 = Perfect Fourth
-
-In Aither:
-- Your state array is the vibrating string
-- Phase accumulation is continuous vibration
-- Hot-reload adjusts tension while the string plays
-- The monochord never stops. Neither does your music.
 
 ## Documentation
 
-- **[AETHER_PARADIGMS.md](docs/AETHER_PARADIGMS.md)** - The Five Elements philosophy
-- **[SURGERY_GUIDE.md](docs/SURGERY_GUIDE.md)** - Live coding workflow
-- **[BEYOND-LISP.md](docs/BEYOND-LISP.md)** - How Aither transcends Lisp/Incudine
-- **[PERFORMANCE_OPTIMIZATION.md](docs/PERFORMANCE_OPTIMIZATION.md)** - Optimization strategies
-- **[AUDIO_BACKEND_ARCHITECTURE.md](docs/AUDIO_BACKEND_ARCHITECTURE.md)** - Backend design
+- **[CORE_VISION.md](docs/CORE_VISION.md)** - The f(s) interface and three unbreakable rules
+- **[HELPERS.md](docs/HELPERS.md)** - Complete DSP helper guide
+- **[STATE_OBJECT.md](docs/STATE_OBJECT.md)** - Understanding the `s` object
+- **[COMPARISON.md](docs/COMPARISON.md)** - How Aither relates to SuperCollider, TidalCycles
+- **[spatial-synthesis.md](docs/paradigms/chora/spatial-synthesis.md)** - Chora paradigm deep dive
 
-## Roadmap
+## Technical Specs
 
-- [x] Core multi-paradigm architecture
-- [x] Rhythmos paradigm (Earth 🌍)
-- [x] Phase-continuous hot-swapping
-- [x] 48kHz @ 32-bit float audio
-- [x] Stereo support (STRIDE=2)
-- [x] Zero-copy buffer optimization
-- [x] Soft clipping with tanh()
-- [x] Context-based signal updates
-- [ ] Kanon paradigm (Fire 🔥)
-- [ ] Atomos paradigm (Air 💨)
-- [ ] Physis paradigm (Water 💧)
-- [ ] Chora paradigm (Aither ✨)
-- [ ] JACK FFI transport (PULL mode, <10ms latency)
-- [ ] 3D oscilloscope integration (STRIDE=4: XYZW)
-- [ ] Vim eval integration (select → send → eval)
+- **Runtime**: Bun (fast JavaScript)
+- **Sample Rate**: 48kHz
+- **Bit Depth**: 32-bit float
+- **Channels**: Stereo (stride-agnostic design)
+- **Buffer Size**: 1024 frames
+- **State Memory**: Float64Array (128 slots per signal)
+- **Helper Memory**: Float64Array (65536 slots shared)
+- **REPL Protocol**: UDP on port 41234
 
-## Credits
+## Inspired By
 
-Inspired by:
-- Incudine (Common Lisp DSP)
-- SuperCollider (live coding pioneer)
-- TidalCycles (pattern-based live coding)
-- Max/MSP (dataflow paradigm)
-- Pythagoras and the monochord
+- **SuperCollider** - Live coding pioneer
+- **TidalCycles** - Pattern-based live coding
+- **Faust** - Functional audio DSP
+- **Pure Data** - Dataflow paradigm
+- **Ancient Greek Philosophy** - The five elements
 
-Built with:
-- [Bun](https://bun.sh) - Fast JavaScript runtime
-- [speaker](https://github.com/TooTallNate/node-speaker) - Node.js audio output
+## Why "Aither"?
+
+**Aither** (αἰθήρ) is the authentic Greek transliteration of the fifth element—the pure upper air that fills the cosmos. It's the substance that unifies the other four elements, just as our `f(s)` interface unifies the five paradigms.
+
+The spelling "Aither" (not "Aether") matches the Greek paradigm names: Kanon, Rhythmos, Atomos, Physis, Chora.
 
 ## License
 
@@ -383,4 +302,4 @@ MIT
 
 ---
 
-*"The monochord never stopped vibrating. It just evolved."* - Aither Engineering Principle
+*"The universe state flows through all paradigms, like aither through the cosmos."*
