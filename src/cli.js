@@ -37,6 +37,12 @@ if (!commands[command]) {
   process.exit(1);
 }
 
+// Rewrite process.argv so the subcommand sees correct arguments
+// Original: ['bun', '/path/to/cli.js', 'send', 'snippet.js']
+// Rewrite to: ['bun', '/path/to/send-repl.js', 'snippet.js']
+const subcommandPath = new URL(commands[command], import.meta.url).pathname;
+process.argv = [process.argv[0], subcommandPath, ...args];
+
 // Dynamic import and run the command
 const modulePath = new URL(commands[command], import.meta.url);
 import(modulePath.href);
