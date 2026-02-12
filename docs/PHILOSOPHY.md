@@ -1,25 +1,27 @@
-# The Five Elements: Philosophy of Multi-Paradigm Synthesis
+# The Five Elements: Philosophy of Unified Synthesis
 
-> *"All things are number. All things flow."*
+> *"One interface. Five paradigms. All things are number. All things flow."*
 > — Pythagoras meets Heraclitus in the Aether
 
 ## The Fundamental Question
 
 Can we capture the **eternal geometry** of sound (Pythagoras) while enabling **live surgical manipulation** (Heraclitus)?
 
-The answer is **yes** — but not with a single paradigm. Different musical ideas require different levels of abstraction. Aether provides **five fundamental synthesis paradigms** (Arche), each representing a different relationship between code and sound.
+The answer is **yes** — with a **single, unified interface** that naturally expresses five different paradigms. Different musical ideas require different levels of abstraction. Aether provides **five fundamental synthesis paradigms** (Arche), each representing a different way of thinking about the same `f(s)` interface.
 
 ---
 
 ## The Five Paradigms (Arche Πέντε)
 
-| Paradigm | Element | Signature | Philosophy | Use Cases |
-|----------|---------|-----------|------------|-----------|
-| **Rhythmos** | Earth 🌍 | `f(state, sr)` | Solid, predictable, phase-continuous | Oscillators, envelopes, smooth live coding |
-| **Kanon** | Fire 🔥 | `f(t)` | Pure, eternal, mathematically beautiful | Demonstrations, composition, modulation sources |
-| **Atomos** | Air 💨 | `f(state, dt)` | Discrete, generative, emergent | Granular synthesis, particle systems, stochastic textures |
-| **Physis** | Water 💧 | `flow(state)` | Physical, organic, natural | String models, waveguides, resonators |
-| **Chora** | Aether ✨ | `field(state)` | Spatial, resonant, holistic | Reverbs, spatial audio, field interactions |
+**All use the same signature**: `f(s) → sample`
+
+| Paradigm | Element | What You Use from `s` | Philosophy | Use Cases |
+|----------|---------|----------------------|------------|-----------|
+| **Kanon** | Fire 🔥 | `s.t` only | Pure, eternal, mathematically beautiful | Demonstrations, composition, modulation sources |
+| **Rhythmos** | Earth 🌍 | `s.state`, `s.sr` | Solid, predictable, phase-continuous | Oscillators, envelopes, smooth live coding |
+| **Atomos** | Air 💨 | `s.state`, `s.dt` | Discrete, generative, emergent | Granular synthesis, particle systems, stochastic textures |
+| **Physis** | Water 💧 | `s.state`, `s.dt` | Physical, organic, natural | String models, waveguides, resonators |
+| **Chora** | Aether ✨ | `s.position`, `s.t` | Spatial, resonant, holistic | Reverbs, spatial audio, field interactions |
 
 ---
 
@@ -80,13 +82,22 @@ Each is powerful but constraining. What if you want:
 
 ### The Aether Solution
 
-Aether is **paradigm-agnostic**. The mixer doesn't care what paradigm you use—it just needs signals that implement `update(context)`.
+Aether provides **one universal interface** that naturally expresses five paradigms:
+
+```javascript
+// All signals use f(s) → sample
+f(s) => sample
+```
+
+**The paradigms are not separate APIs**. They are **coding styles** that emphasize different parts of the universe state `s`.
 
 This allows:
-1. **Paradigm isolation**: Each paradigm is pure and focused
-2. **Cross-paradigm composition**: Mix different approaches seamlessly
-3. **Incremental learning**: Start simple (Kanon or Rhythmos), add complexity as needed
-4. **Conceptual clarity**: No mental model confusion
+1. **Unified learning**: Learn one interface, get five paradigms
+2. **Natural composition**: All paradigms compose seamlessly (they're all just functions)
+3. **Incremental exploration**: Start simple, add complexity by using more of `s`
+4. **Conceptual clarity**: Same interface, different emphasis
+
+The engine doesn't care which paradigm you use—all it sees is `f(s)` functions that compose naturally.
 
 ---
 
@@ -193,59 +204,103 @@ Kanon.register('harmony',
 
 ---
 
-## IV. The Conceptual Purity Principle
+## IV. The Paradigm Choice Principle
 
-### Why They Must Remain Separate
+### Understanding the Trade-offs
 
-**Problem**: Mixing paradigms in the same signal creates **conceptual pollution**.
+**The beauty**: All paradigms use `f(s)`, so they compose naturally.
 
-If Rhythmos allowed `f(t)` functions, you could accidentally write:
+**The discipline**: Each paradigm emphasizes different parts of `s` for a reason. Understand the trade-offs:
+
 ```javascript
-Rhythmos.register('danger', (state, idx, sr) => {
-  return Math.sin(2 * Math.PI * 440 * globalThis.time); // WRONG!
+// Kanon: Uses only s.t (stateless)
+register('kanon', s => Math.sin(2 * Math.PI * 440 * s.t));
+// ✅ Pure mathematics
+// ⚠️  Hot-reload will pop if you change 440 → 550
+
+// Rhythmos: Uses s.state (explicit phase)
+register('rhythmos', s => {
+  s.state[0] = (s.state[0] + 440 / s.sr) % 1.0;
+  return Math.sin(s.state[0] * 2 * Math.PI);
 });
+// ✅ Phase-continuous hot-reload
+// ⚠️  More code, state management
+
+// Atomos: Uses s.state and s.dt (discrete process)
+register('atomos', s => {
+  s.state[0] += (Math.random() - 0.5) * s.dt * 100;
+  return Math.tanh(s.state[0]);
+});
+// ✅ Emergent, generative
+// ⚠️  Less direct control
+
+// Physis: Uses s.state and s.dt (physics)
+// Chora: Uses s.position (spatial)
 ```
 
-This would **jump** when you change 440 → 550 during hot-reload because `globalThis.time` didn't reset. You've lost **phase continuity**—the whole point of Rhythmos!
-
-**Solution**: Enforce paradigm boundaries.
-- **Rhythmos** = explicit state, phase continuity guaranteed
-- **Kanon** = pure `f(t)`, mathematical purity guaranteed
-- **Atomos** = discrete events, stochastic control
-- **Physis** = physics simulation, organic realism
-- **Chora** = spatial fields, holistic resonance
-
-Each paradigm has **conceptual integrity**. No confusion, no accidental bugs.
+**Each paradigm has conceptual integrity**:
+- Choose **Kanon** for pure math (accept pops on non-periodic changes)
+- Choose **Rhythmos** for smooth performance (accept state management)
+- Choose **Atomos** for emergence (accept unpredictability)
+- Choose **Physis** for realism (accept physics thinking)
+- Choose **Chora** for space (accept spatial thinking)
 
 ---
 
 ## V. Cross-Paradigm Composition
 
-But what if you want to **combine** paradigms?
+The beauty of the unified `f(s)` interface is that **combining paradigms is trivial**—they're all just functions.
 
 ### Example: Kanon Modulating Rhythmos
 
 ```javascript
-// Kanon: Pure mathematical LFO
-const lfo = t => Math.sin(2 * Math.PI * 0.5 * t);
+// Use Kanon style for the LFO (pure time function)
+register('vibrato', s => {
+  const lfo = Math.sin(2 * Math.PI * 0.5 * s.t);  // Kanon: pure f(t)
+  const modulatedFreq = 440 + lfo * 10;           // ±10 Hz vibrato
 
-// Feed into Rhythmos (Earth uses Fire as modulation source)
-Rhythmos.register('vibrato', (state, idx, sr) => {
-  const baseFreq = 440;
-  const lfoValue = lfo(globalThis.AETHER_TIME); // Sample the Kanon function
-  const modulatedFreq = baseFreq + lfoValue * 10; // ±10 Hz vibrato
-
-  const phaseIncrement = modulatedFreq / sr;
-  return {
-    update: (context) => {
-      state[idx] = ((state[idx] || 0) + phaseIncrement) % 1.0;
-      return [Math.sin(state[idx] * 2 * Math.PI)];
-    }
-  };
+  // Use Rhythmos style for the carrier (phase accumulation)
+  s.state[0] = (s.state[0] + modulatedFreq / s.sr) % 1.0;
+  return Math.sin(s.state[0] * 2 * Math.PI) * 0.3;
 });
 ```
 
-Kanon provides **pure mathematical control**, Rhythmos provides **smooth execution**.
+**Same function, two paradigms**. Kanon provides the modulation, Rhythmos provides the carrier.
+
+### Example: All Five Together
+
+```javascript
+register('synthesis-universe', s => {
+  // Kanon: Pure LFO
+  const lfo = Math.sin(2 * Math.PI * 0.2 * s.t);
+
+  // Rhythmos: Phase-continuous oscillator
+  const freq = 220 + lfo * 20;
+  s.state[0] = (s.state[0] + freq / s.sr) % 1.0;
+  let sound = Math.sin(s.state[0] * 2 * Math.PI);
+
+  // Atomos: Add stochastic noise
+  s.state[1] += (Math.random() - 0.5) * s.dt;
+  s.state[1] *= 0.99;  // Decay
+  sound += s.state[1] * 0.1;
+
+  // Physis: Simple resonator
+  const k = 50;
+  s.state[2] = s.state[2] || 0;
+  s.state[3] = s.state[3] || 0;
+  s.state[3] += -k * s.state[2] * s.dt;
+  s.state[2] += s.state[3] * s.dt + sound * 0.01;
+  sound = s.state[2];
+
+  // Chora: Spatial attenuation
+  const dist = Math.sqrt(s.position.x**2 + s.position.y**2 + s.position.z**2);
+  sound /= (dist + 1);
+
+  return sound * 0.3;
+});
+```
+
+**All five paradigms in one signal**. This is the power of the unified interface.
 
 ---
 
@@ -329,17 +384,19 @@ All five elements working together create the Music of the Spheres.
 
 ## IX. The Aether Engineering Principle
 
-> *"The monochord never stopped vibrating. It just evolved."*
+> *"One interface. Five paradigms. The monochord never stopped vibrating. It just evolved."*
 
-Aether doesn't force you into a single way of thinking. It provides **five complementary ways** to think about sound:
+Aether provides a single interface that naturally expresses **five complementary ways** to think about sound:
 
-- As eternal geometry (Kanon)
-- As living process (Rhythmos)
-- As emergent texture (Atomos)
-- As physical resonance (Physis)
-- As spatial field (Chora)
+- As eternal geometry (Kanon: `s.t`)
+- As living process (Rhythmos: `s.state`, `s.sr`)
+- As emergent texture (Atomos: `s.state`, `s.dt`)
+- As physical resonance (Physis: `s.state`, `s.dt`)
+- As spatial field (Chora: `s.position`, `s.t`)
 
-Use one, use all five. The mixer doesn't judge—it just mixes.
+Use one, use all five, mix them freely. They're all just `f(s)` functions.
+
+The engine doesn't judge—it just renders.
 
 **Welcome to the Aether.**
 

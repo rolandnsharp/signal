@@ -6,11 +6,11 @@
 
 **Kanon** (κανών) - Ancient Greek for "rule" or "measuring rod" - was the monochord instrument Pythagoras used to discover that harmony is mathematical ratio.
 
-In Aether, **Kanon** represents the **pure functional paradigm**: sound as a function of time `f(t)`.
+In Aether, **Kanon** represents the **pure functional paradigm**: sound as a stateless function that uses only time.
 
 ### The Pythagorean View
 
-Kanon treats sound as **eternal geometry** that exists timelessly. When you write `f(t)`, you're not simulating a process—you're **observing a crystalline structure** that exists in its entirety.
+Kanon treats sound as **eternal geometry** that exists timelessly. When you write a Kanon signal, you're not simulating a process—you're **observing a crystalline structure** that exists in its entirety.
 
 - Sound waves are **timeless blueprints**
 - Harmony is **mathematical ratio** (3:2, 4:3, φ)
@@ -19,14 +19,23 @@ Kanon treats sound as **eternal geometry** that exists timelessly. When you writ
 
 ---
 
-## Signature
+## The Unified Interface
+
+**Like all Aether paradigms**, Kanon uses the universal signature:
 
 ```javascript
-f(t) → sample
+f(s) → sample
+```
+
+**The Kanon style**: Use only `s.t` from the universe state. Ignore everything else.
+
+```javascript
+// Kanon style - pure function of time
+register('sine', s => Math.sin(2 * Math.PI * 440 * s.t));
 ```
 
 Where:
-- `t` = absolute time (seconds)
+- `s.t` = absolute time (seconds)
 - `sample` = audio value at that moment
 
 **Pure function**: No state, no history, just pure mathematics.
@@ -52,20 +61,22 @@ Where:
 ## Quick Example
 
 ```javascript
-import { Kanon } from './src/arche/kanon/index.js';
+// Pure functions of time using s.t
+register('sine440', s => Math.sin(2 * Math.PI * 440 * s.t));
+register('sine660', s => Math.sin(2 * Math.PI * 660 * s.t));
 
-// Pure functions of time
-const sine440 = t => Math.sin(2 * Math.PI * 440 * t);
-const sine660 = t => Math.sin(2 * Math.PI * 660 * t);
+// Perfect fifth harmony (3:2 ratio) with composition
+register('harmony', s => {
+  const a = Math.sin(2 * Math.PI * 440 * s.t);
+  const b = Math.sin(2 * Math.PI * 660 * s.t);
+  return (a + b) * 0.5;
+});
 
-// Perfect fifth harmony (3:2 ratio)
-Kanon.register('harmony',
-  Kanon.pipe(
-    Kanon.mix(
-      Kanon.gain(0.5, sine440),
-      Kanon.gain(0.5, sine660)
-    ),
-    Kanon.softClip
+// Or using helpers
+register('harmony-piped',
+  pipe(
+    s => Math.sin(2 * Math.PI * 440 * s.t) + Math.sin(2 * Math.PI * 660 * s.t),
+    gain(0.5)
   )
 );
 ```
@@ -128,20 +139,34 @@ const harmony = t => fundamental(t) + fifth(t);
 
 ## When to Use Kanon vs Rhythmos
 
-Use **Kanon** when:
+Both paradigms use `f(s)`, but emphasize different parts:
+
+Use **Kanon style** (`s.t` only) when:
 - Exploring mathematical relationships
 - Teaching concepts
 - Creating modulation sources
 - You don't care about hot-reload discontinuities
 - Purity matters more than smoothness
 
-Use **Rhythmos** when:
+Use **Rhythmos style** (`s.state`, `s.sr`) when:
 - Performing live with hot-reload
 - Need smooth parameter changes
 - Building production instruments
 - Phase continuity is essential
 
-**Or use both!** Kanon can modulate Rhythmos signals.
+**Or use both in the same signal!**
+
+```javascript
+register('kanon-rhythmos-mix', s => {
+  // Kanon: Pure modulation
+  const lfo = Math.sin(2 * Math.PI * 0.5 * s.t);
+
+  // Rhythmos: Phase-continuous carrier
+  const freq = 440 + lfo * 20;
+  s.state[0] = (s.state[0] + freq / s.sr) % 1.0;
+  return Math.sin(s.state[0] * 2 * Math.PI) * 0.3;
+});
+```
 
 ---
 
@@ -216,52 +241,66 @@ export const sequence = (...pairs) => t => {
 
 ---
 
-## API Reference
+## Working with Kanon
 
-See [Kanon API Reference](api-reference.md) for complete documentation.
-
-### Core Functions
+### Registration
 
 ```javascript
-// Registration
-Kanon.register(id, fn)
+// Register a Kanon-style signal (uses only s.t)
+register('my-kanon-signal', s => {
+  return Math.sin(2 * Math.PI * 440 * s.t);
+});
+```
 
-// Composition
-Kanon.pipe(...functions)      // Left-to-right
-Kanon.compose(...functions)   // Right-to-left
+### Composition with Helpers
 
-// Transformations
-Kanon.gain(amount, fn)
-Kanon.offset(amount, fn)
-Kanon.mix(...functions)
-Kanon.clip(fn)
-Kanon.softClip(fn)
+All Aether helpers work with Kanon signals since everything uses `f(s)`:
 
-// Time-based
-Kanon.during(start, end, fn)
-Kanon.sequence([fn1, dur1], [fn2, dur2], ...)
-Kanon.loop(count, duration, fn)
-Kanon.loopForever(duration, fn)
+```javascript
+// Compose with pipe
+register('composed',
+  pipe(
+    s => Math.sin(2 * Math.PI * 440 * s.t),
+    gain(0.5),
+    lowpass(800)
+  )
+);
 
-// Delays & Feedback
-Kanon.delay(delayTime, fn)
-Kanon.feedback(delayTime, amount, fn)
-Kanon.feedbackY(delayTime, amount, fn)  // Y-combinator version
+// Or manually
+register('manual', s => {
+  const osc = Math.sin(2 * Math.PI * 440 * s.t);
+  // Apply helpers inline
+  return osc * 0.5;
+});
+```
 
-// Modulation
-Kanon.am(modulator, carrier)
-Kanon.fm(depth, modulator, carrier)
-Kanon.ringMod(modulator, carrier)
+### Common Kanon Patterns
 
-// Envelopes
-Kanon.envExp(rate, t)
-Kanon.envLinear(duration, t)
-Kanon.envAD(attack, decay, t)
+```javascript
+// Modulation source (LFO)
+const lfo = s => Math.sin(2 * Math.PI * 0.5 * s.t);
 
-// Utilities
-Kanon.constant(value)
-Kanon.silence
-Kanon.ramp(a, b, duration, t)
+// FM synthesis
+register('fm', s => {
+  const modulator = Math.sin(2 * Math.PI * 110 * s.t) * 5;
+  return Math.sin(2 * Math.PI * 440 * s.t + modulator) * 0.3;
+});
+
+// Harmonic series
+register('harmonics', s => {
+  let sum = 0;
+  for (let i = 1; i <= 8; i++) {
+    sum += Math.sin(2 * Math.PI * 220 * i * s.t) / i;
+  }
+  return sum * 0.1;
+});
+
+// Time-based envelope
+register('envelope', s => {
+  const envelope = Math.exp(-s.t * 2);
+  const osc = Math.sin(2 * Math.PI * 440 * s.t);
+  return osc * envelope * 0.5;
+});
 ```
 
 ---

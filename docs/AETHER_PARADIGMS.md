@@ -1,77 +1,219 @@
 # The Arche of Aether: The Five Paradigms
 
-This document outlines the five fundamental synthesis paradigms of the Aether engine. In ancient Greek philosophy, the **`Arche` (Ἀρχή)** was the "first principle" or fundamental substance from which all things emerge. Our five paradigms are the `Arche` of the Aether universe—the classical elements from which all sound can be composed. The engine's code is structured around this concept in the `src/arche` directory.
+This document outlines the five fundamental synthesis paradigms of the Aether engine. In ancient Greek philosophy, the **`Arche` (Ἀρχή)** was the "first principle" or fundamental substance from which all things emerge. Our five paradigms are the `Arche` of the Aether universe—the classical elements from which all sound can be composed.
+
+**Critical Understanding**: These five paradigms are **not separate APIs**. They are **expressive styles** that emerge naturally from the single, universal interface: `f(s)`.
 
 This progression is a journey of relinquishing direct control to embrace higher levels of abstraction, moving from a composer of notes to a physicist of virtual worlds.
 
-## The Hierarchy of Abstraction
+## The Unified Interface: `f(s)`
 
-| Paradigm | Style | Analogy (Element) | Core Concept |
+**All paradigms use the same signature**: `f(s) → sample`
+
+Where `s` is "the state of the universe":
+```javascript
+s = {
+  t: 0,           // Absolute time in seconds
+  dt: 1/48000,    // Time delta for this sample
+  sr: 48000,      // Sample rate
+  idx: 0,         // Sample index in buffer
+  position: {x, y, z},  // Listener position in space
+  name: "signal-name",  // Signal's unique identifier
+  state: Float64Array(...)  // Signal's sandboxed state memory
+}
+```
+
+## The Five Expressive Styles
+
+| Paradigm | Element | What You Use from `s` | Core Concept |
 | :--- | :--- | :--- | :--- |
-| 1. **Kanon** | `f(t)` | **Fire** 🔥 | The Abstract Ideal (Implicit State) |
-| 2. **Rhythmos** | `f(state, sr)` | **Earth** 🌍 | The Measured Form (Explicit State) |
-| 3. **Atomos** | `f(state, dt)` | **Air** 💨 | The Emergent Process |
-| 4. **Physis** | `flow(state)` | **Water** 💧 | The Physical Flow |
-| 5. **Chora** | `field(state)`| **Aether** ✨ | The Resonant Medium |
+| 1. **Kanon** | **Fire** 🔥 | `s.t` only | The Abstract Ideal (Stateless) |
+| 2. **Rhythmos** | **Earth** 🌍 | `s.state`, `s.sr` | The Measured Form (Explicit State) |
+| 3. **Atomos** | **Air** 💨 | `s.state`, `s.dt` | The Emergent Process |
+| 4. **Physis** | **Water** 💧 | `s.state`, `s.dt` | The Physical Flow |
+| 5. **Chora** | **Aether** ✨ | `s.position`, `s.t` | The Resonant Medium |
 
 ---
 
-### 1. `Kanon(t)` - The Abstract Ideal (Fire)
+### 1. Kanon - The Abstract Ideal (Fire 🔥)
 
-This paradigm is the platonic ideal of Fire—pure, timeless, and abstract energy. It describes sound as a stateless, mathematical fact.
+**Style**: Use only `s.t` from the universe state. Ignore everything else.
 
--   **Concept:** While a pure `f(t)` function is theoretically stateless, live-codable continuity can be achieved through **implicit state**, where the engine secretly manages phase-correction logic behind the scenes. The user writes a "pure" function, but the state is merely hidden, not gone.
--   **Limitation:** The hidden state is a "black box." This makes it impossible to build more complex systems that require direct, granular control over state variables. It is a perfect blueprint, but an inflexible building material.
+This paradigm is the platonic ideal of Fire—pure, timeless, and abstract energy. It describes sound as a **stateless mathematical function of time**.
 
----
+```javascript
+// Kanon: Pure function of time
+register('pure-sine', s => {
+  return Math.sin(2 * Math.PI * 440 * s.t);
+});
 
-### 2. `Rhythmos(state, sr)` - The Measured Form (Earth)
+// FM synthesis in Kanon style
+register('fm', s => {
+  const modulator = Math.sin(2 * Math.PI * 110 * s.t) * 5;
+  return Math.sin(2 * Math.PI * 440 * s.t + modulator);
+});
+```
 
-This is the solid, foundational, and structural paradigm. It represents the most critical evolutionary step in the engine: making state **explicit**.
-
--   **Analogy:** A crystal, a grid, a metronome. `Rhythmos` provides the tangible, reliable ground upon which all other structures can be built.
--   **Concept:** This paradigm introduces **explicit state management**. The user is given direct access to the state (`mem[idx]`) and is responsible for evolving it over time. This shift from implicit to explicit state is what unlocks the full power of the Aether engine.
--   **Strength:** The paradigm for creating the solid, reliable, and foundational elements of music. It is the necessary prerequisite for all higher paradigms.
-
----
-
-### 3. `Atomos(state, dt)` - The Emergent Process (Air)
-
-This paradigm is less predictable, more chaotic. Like the air, it can be still one moment and turbulent the next, representing the emergence of complex patterns from the simple, discrete interactions of its constituent particles.
-
--   **Analogy:** The weather, the wind, a breath. It is the realm of `Pneuma` (spirit). We advance our world one "indivisible step" (`dt`) at a time and observe the emergent behavior.
--   **Concept:** Sound as a generative process, emerging from discrete, fundamental steps of an internal, local clock.
--   **Strength:** Excellent for generative and chaotic systems where control is indirect, leading to exploration and "happy accidents."
+-   **Philosophy:** Sound as eternal geometry. The waveform exists timelessly—you're observing it, not simulating it.
+-   **Strength:** Mathematically pure, elegant, perfect for exploring harmonic relationships.
+-   **Limitation:** Hot-reloading non-periodic functions will cause discontinuities (clicks/pops).
 
 ---
 
-### 4. `Physis(state)` - The Physical Flow (Water)
+### 2. Rhythmos - The Measured Form (Earth 🌍)
 
-This paradigm represents the flow of a river around rocks, the behavior of a droplet, the tide. It is dynamic, reactive, and flowing, but still governed by clear physical laws like momentum and inertia.
+**Style**: Use `s.state` and `s.sr` from the universe state. Manage phase explicitly.
 
--   **Analogy:** A true virtual world of objects. We are no longer the computer; we are physicists defining the laws of our universe. We create a virtual object and listen as it behaves according to its nature.
--   **Concept:** Sound as the natural, flowing behavior of a virtual **object**. We let the engine create the flow of time for us.
--   **Strength:** Highly intuitive and organic. Live coding becomes about manipulating physical properties, not algorithms.
+This is the solid, foundational, and structural paradigm. It represents the most critical evolutionary step: making state **explicit** for phase-continuous synthesis.
+
+```javascript
+// Rhythmos: Explicit state management for phase continuity
+register('phase-continuous-sine', s => {
+  // s.state is this signal's sandboxed Float64Array
+  s.state[0] = (s.state[0] + 440 / s.sr) % 1.0;
+  return Math.sin(s.state[0] * 2 * Math.PI);
+});
+
+// Change 440 → 550 and save: SMOOTH MORPH, no click!
+
+// Complex waveforms
+register('saw', s => {
+  s.state[0] = (s.state[0] + 110 / s.sr) % 1.0;
+  return (s.state[0] * 2 - 1) * 0.5;  // Sawtooth
+});
+```
+
+-   **Philosophy:** The monochord that never stops vibrating. State flows continuously through time.
+-   **Strength:** Phase-continuous hot-reloading. Change parameters mid-performance without clicks.
+-   **Use case:** Traditional synthesis, live performance, any time smoothness matters.
 
 ---
 
-### 5. `Chora(state)` - The Resonant Medium (Aether)
+### 3. Atomos - The Emergent Process (Air 💨)
 
-This is the most profound paradigm: the all-pervading medium, the substance of space itself, the context in which everything else exists and through which all waves propagate. It is the Platonic "receptacle" in which the other elements take form.
+**Style**: Use `s.state` and `s.dt` from the universe state. Think in discrete time steps.
 
--   **Analogy:** From a virtual world to a virtual universe. We are no longer just placing objects in space; we are defining the very fabric of space-time itself.
--   **Concept:** Sound as the emergent property of an entire **medium**. We stop defining objects and instead define the space in which they could exist.
--   **Strength:** Unlocks the simulation of true physical sound phenomena: wave propagation, reflection, and diffusion. The ultimate paradigm for creating emergent, physically realistic sonic environments.
+This paradigm is less predictable, more chaotic. Like the air, it represents the emergence of complex patterns from simple, discrete interactions.
+
+```javascript
+// Atomos: Discrete emergent processes
+register('bouncing-particle', s => {
+  // State: [position, velocity]
+  s.state[0] = s.state[0] || 0;
+  s.state[1] = s.state[1] || 1;
+
+  // Update position by velocity (discrete step)
+  s.state[0] += s.state[1] * s.dt * 100;
+
+  // Bounce at boundaries
+  if (Math.abs(s.state[0]) > 1) {
+    s.state[1] *= -0.95;  // Lose energy on bounce
+  }
+
+  return s.state[0] * 0.5;
+});
+```
+
+-   **Philosophy:** The weather, the wind, emergent chaos. Discrete steps create unpredictable beauty.
+-   **Strength:** Generative systems, granular synthesis, stochastic processes.
+-   **Use case:** When you want emergence, not direct control. Happy accidents.
+
+---
+
+### 4. Physis - The Physical Flow (Water 💧)
+
+**Style**: Use `s.state` and `s.dt` to model physical laws. Let physics create the sound.
+
+This paradigm represents the flow of water—dynamic, reactive, governed by clear physical laws like momentum and inertia.
+
+```javascript
+// Physis: Physics simulation
+register('spring', s => {
+  // State: [position, velocity]
+  const k = 100;      // Spring constant
+  const damping = 0.1;
+
+  s.state[0] = s.state[0] || 0.1;  // Start displaced
+  s.state[1] = s.state[1] || 0;
+
+  // Hooke's law: F = -kx
+  const force = -k * s.state[0] - damping * s.state[1];
+
+  // Integrate: v += F*dt, x += v*dt
+  s.state[1] += force * s.dt;
+  s.state[0] += s.state[1] * s.dt;
+
+  return s.state[0] * 0.5;
+});
+```
+
+-   **Philosophy:** Virtual objects obeying natural laws. You're a physicist, not a programmer.
+-   **Strength:** Organic, realistic, intuitive timbres. Physical modeling synthesis.
+-   **Use case:** Plucked strings, blown tubes, struck membranes.
+
+---
+
+### 5. Chora - The Resonant Medium (Aether ✨)
+
+**Style**: Use `s.position` and `s.t` to create spatial wavefields. Space itself is the instrument.
+
+This is the most profound paradigm: the all-pervading medium, the fabric of space itself through which all waves propagate.
+
+```javascript
+// Chora: Spatial wavefield
+register('propagating-wave', s => {
+  const { x, y, z } = s.position;
+  const distance = Math.sqrt(x*x + y*y + z*z);
+  const waveSpeed = 340;  // Speed of sound in air (m/s)
+
+  // Wave equation: amplitude falls with 1/r, propagates at waveSpeed
+  const travelTime = distance / waveSpeed;
+  const phase = 2 * Math.PI * 440 * (s.t - travelTime);
+
+  return Math.sin(phase) / (distance + 1);
+});
+
+// Move the listener position to hear doppler, distance attenuation
+```
+
+-   **Philosophy:** Space itself resonates. Define the medium, not the objects within it.
+-   **Strength:** True physical sound phenomena—propagation, reflection, spatial audio.
+-   **Use case:** Reverb, room acoustics, 3D audio, wavefield synthesis.
 
 ## The Unified Vision
 
-The ultimate goal for Aether is not to choose one style, but to allow them all to coexist as interoperable layers of abstraction. A live coder should be able to:
--   Create a solid foundation using **Rhythmos**.
--   Add an evolving, textural pad using **Atomos**.
--   Introduce a lead voice that feels like a physical object using **Physis**.
--   Simulate the resonance of that voice in a virtual room using **Chora**.
+**This is the key**: All five paradigms use the same `f(s)` interface. There are no separate APIs to learn.
 
-By providing this complete hierarchy, Aether can become a powerful instrument for both musical composition and the exploration of entire sonic universes.
+The ultimate goal for Aether is to allow all five styles to coexist seamlessly. A live coder can:
+-   Create a solid foundation using **Rhythmos** (explicit state)
+-   Add an evolving, textural pad using **Atomos** (discrete emergence)
+-   Introduce a lead voice using **Physis** (physics modeling)
+-   Simulate the resonance in a virtual room using **Chora** (spatial field)
+-   Use **Kanon** functions to modulate any of the above
+
+**All in the same session, all using `f(s)`, all composing naturally.**
+
+```javascript
+// Mix all five paradigms in one composition
+register('kanon-lfo', s => Math.sin(2 * Math.PI * 0.5 * s.t));
+
+register('rhythmos-bass', s => {
+  const lfo = Math.sin(2 * Math.PI * 0.5 * s.t);
+  const freq = 55 + lfo * 5;
+  s.state[0] = (s.state[0] + freq / s.sr) % 1.0;
+  return Math.sin(s.state[0] * 2 * Math.PI) * 0.3;
+});
+
+register('atomos-texture', s => {
+  s.state[0] += (Math.random() - 0.5) * s.dt * 10;
+  s.state[0] = Math.max(-1, Math.min(1, s.state[0]));
+  return s.state[0] * 0.1;
+});
+
+// They all run together, seamlessly
+```
+
+By providing this complete hierarchy within a single interface, Aether becomes a powerful instrument for both musical composition and the exploration of entire sonic universes.
 
 ---
 
@@ -135,32 +277,88 @@ It may seem surprising that JavaScript is the ideal language for a project with 
 
 ## Composing the Paradigms: An Instrument Builder's Guide
 
-The five paradigms are not just alternatives; they are the fundamental elements for a rich compositional language. Classic synthesis techniques can be understood not as new paradigms, but as compositions of the existing ones.
+The five paradigms are not just alternatives; they are the fundamental elements for a rich compositional language. Classic synthesis techniques can be understood as compositions using different paradigm styles.
 
 ### Subtractive Synthesis
 -   **Concept:** Start with a rich sound, then filter it.
 -   **Aether Composition:**
-    1.  **Source:** A harmonically rich `Rhythmos` oscillator (e.g., `Rhythmos(saw(110))`).
-    2.  **Filter:** A `Physis` object that models a resonant body. The `Rhythmos` signal is used as a force to `drive` the `Physis` object, and we listen to the object's physical reaction.
+    ```javascript
+    // Source: Rhythmos sawtooth (rich harmonics)
+    const saw = s => {
+      s.state[0] = (s.state[0] + 110 / s.sr) % 1.0;
+      return (s.state[0] * 2 - 1);
+    };
+
+    // Filter: Use a helper (or implement as Physis resonator)
+    register('subtractive', pipe(saw, lowpass(800)));
+    ```
 
 ### Additive Synthesis
 -   **Concept:** Build a complex sound by mixing many sine waves.
--   **Aether Composition:** A `mix` of many `Rhythmos` sine wave oscillators. For a more organic, shimmering sound, the higher harmonics could be generated by unstable `Atomos` systems or a collection of small `Physis` objects.
+-   **Aether Composition:**
+    ```javascript
+    // Mix many Rhythmos sine waves at harmonic ratios
+    register('additive', s => {
+      let sum = 0;
+      const fundamental = 110;
+      for (let i = 1; i <= 8; i++) {
+        const freq = fundamental * i;
+        const amp = 1 / i;  // Amplitude falls with harmonic number
+        s.state[i] = (s.state[i] + freq / s.sr) % 1.0;
+        sum += Math.sin(s.state[i] * 2 * Math.PI) * amp;
+      }
+      return sum * 0.1;
+    });
+    ```
 
 ### Frequency Modulation (FM) Synthesis
 -   **Concept:** Use one oscillator (Modulator) to modulate the frequency of another (Carrier).
 -   **Aether Composition:**
-    1.  **Classic FM:** Two `Rhythmos` oscillators interacting.
-    2.  **Physical FM:** Use a `Rhythmos` oscillator to modulate the `tension` parameter of a `Physis` object in real-time. The result is a physical object being "strained" and warped, producing incredibly dynamic, non-linear sounds.
+    ```javascript
+    // Classic FM using Kanon style for modulator, Rhythmos for carrier
+    register('fm', s => {
+      const modulator = Math.sin(2 * Math.PI * 110 * s.t) * 50;
+      const carrierFreq = 440 + modulator;
+      s.state[0] = (s.state[0] + carrierFreq / s.sr) % 1.0;
+      return Math.sin(s.state[0] * 2 * Math.PI) * 0.3;
+    });
 
-### The Special Role of the `Chora` Paradigm
+    // Or pure Kanon style
+    register('fm-pure', s => {
+      const mod = Math.sin(2 * Math.PI * 110 * s.t) * 5;
+      return Math.sin(2 * Math.PI * 440 * s.t + mod) * 0.3;
+    });
+    ```
 
-You may notice the `Chora` paradigm is not often used as a primary sound *source* in these classic compositions. This is because its role is even more fundamental.
+### The Special Role of the Chora Paradigm
 
-While `Rhythmos`, `Atomos`, and `Physis` are excellent for creating **instruments** and **effects**, the `Chora` paradigm is used to create the **virtual acoustic space** in which those instruments exist.
+You may notice the `Chora` paradigm is not often used as a primary sound *source* in classic compositions. This is because its role is even more fundamental.
 
--   **Physically Modeled Reverb:** A `Chora` field can simulate a 1D, 2D, or 3D space. By exciting the field at one point with a sound source and listening from another point, you can create physically accurate reverb, complete with wave propagation and reflection.
--   **Resonant Body Simulation:** A `Chora` field can act as the ultimate physical filter. You can model a 2D drum membrane, and then continuously excite its center with a `Rhythmos` sawtooth wave. The sound you hear is not the sawtooth, but the rich, complex, and physically accurate resonant response of the drum `Chora` itself.
--   **Waveguides:** A 1D `Chora` field can act as a waveguide, modeling the body of a flute or the tube of a brass instrument. You can inject noise (from `Atomos`) into one end and listen to how the `Chora`'s resonant properties turn that noise into a musical tone.
+While `Kanon`, `Rhythmos`, `Atomos`, and `Physis` are excellent for creating **instruments**, the `Chora` paradigm is used to create the **virtual acoustic space** in which those instruments exist.
 
-Ultimately, the `Chora` paradigm is the final piece of the puzzle, allowing the live coder to move beyond creating just the sound, and start designing the very universe in which the sound exists.
+```javascript
+// Physically Modeled Reverb using Chora
+register('reverb-space', s => {
+  // Simulate a 2D room with wave propagation
+  const { x, y } = s.position;
+  const sourceX = 0, sourceY = 0;
+  const dist = Math.sqrt((x - sourceX)**2 + (y - sourceY)**2);
+
+  // Multiple reflections from walls
+  let sum = 0;
+  for (let reflect = 0; reflect < 5; reflect++) {
+    const reflectDist = dist + reflect * 10;  // Each reflection travels further
+    const delay = reflectDist / 340;  // Speed of sound
+    const amp = 1 / (reflectDist + 1);  // Distance attenuation
+    sum += Math.sin(2 * Math.PI * 440 * (s.t - delay)) * amp;
+  }
+  return sum * 0.2;
+});
+```
+
+**Key uses:**
+-   **Physically Modeled Reverb:** Wave propagation and reflection in virtual spaces
+-   **Resonant Body Simulation:** Model drum membranes, guitar bodies
+-   **Waveguides:** Flute tubes, brass instruments—inject noise, hear music
+
+Ultimately, the `Chora` paradigm is the final piece of the puzzle, allowing you to move beyond creating just the sound, and start designing the very universe in which the sound exists.
