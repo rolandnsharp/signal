@@ -86,22 +86,22 @@ const api = {
             } while (existingOffsets.has(potentialOffset));
             offset = potentialOffset;
             OFFSETS.set(name, offset);
-            console.log(`[LEL] Allocated new permanent offset ${offset} for "${name}".`);
+            console.log(`[Aither] Allocated new permanent offset ${offset} for "${name}".`);
         }
         const stateSubarray = STATE.subarray(offset, offset + SLOTS_PER_SIGNAL);
         REGISTRY.set(name, { fn, stateObject: stateSubarray }); 
-        console.log(`[LEL] Registered function for "${name}".`);
+        console.log(`[Aither] Registered function for "${name}".`);
     },
     
     unregister: (name) => {
         if (!REGISTRY.has(name)) {
-            console.warn(`[LEL] Signal "${name}" not found for unregistration.`);
+            console.warn(`[Aither] Signal "${name}" not found for unregistration.`);
             return;
         }
 
         // 1. Remove the signal function from the active registry.
         REGISTRY.delete(name);
-        console.log(`[LEL] Unregistered function for "${name}".`);
+        console.log(`[Aither] Unregistered function for "${name}".`);
 
         // 2. Perform Garbage Collection on the helper state map.
         //    We delete all helper keys associated with this signal name.
@@ -118,7 +118,7 @@ const api = {
         }
         // Note: The freed memory in LEL_HELPER_MEMORY is not yet compacted.
         // This is a future optimization if memory fragmentation becomes an issue.
-        console.log(`[LEL] GC: Collected ${collectedCount} helper state slot(s) for "${name}".`);
+        console.log(`[Aither] GC: Collected ${collectedCount} helper state slot(s) for "${name}".`);
     },
 
     // Musical aliases
@@ -134,7 +134,7 @@ const api = {
             if (globalThis.LEL_HELPER_SLOT_MAP) globalThis.LEL_HELPER_SLOT_MAP.clear();
             if (globalThis.LEL_HELPER_STATE) globalThis.LEL_HELPER_STATE.nextSlot = 0; // Reset nextSlot
         }
-        console.log('[LEL] Cleared function registry.');
+        console.log('[Aither] Cleared function registry.');
     },
     
     setPosition: (newPosition) => {
