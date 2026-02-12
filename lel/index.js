@@ -76,8 +76,9 @@ function generateAudioChunk() {
         s.t += s.dt;
         s.idx = i;
 
-        for (const { fn, stateObject } of REGISTRY.values()) {
+        for (const [name, { fn, stateObject }] of REGISTRY.entries()) {
             s.state = stateObject;
+            s.name = name; // Pass the signal's unique name into the context object
             const result = fn(s);
             if (Array.isArray(result)) {
                 left += result[0] || 0;

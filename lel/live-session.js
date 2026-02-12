@@ -1,21 +1,69 @@
-// Welcome to your live-coding session in LEL!
+// live-session.js - Live Coding Interface for LEL
 // This file is watched by `bun --hot`. When you save, the whole
 // engine reloads, and this file is re-run.
 
 import { register, clear } from './index.js';
+// Import the new helpers, including the essential `resetHelperCounter` and `pipe`
+import { gain, pan, tremolo, lowpass, resetHelperCounter, pipe } from './helpers.js';
 
-// --- HMR Cleanup ---
-// This is the key to the `aether` hot-reload pattern.
-// By calling clear() here (with `fullReset=false`), we remove all
-// functions from the registry but PRESERVE the state memory and offsets.
-// This ensures phase-continuity on reload.
+// Clear all signal functions on every reload.
 clear();
 
-// --- Example 1: Simple Sine Wave with Performant State ---
-// Try changing the frequency (e.g., to 220) and saving the file. The tone
-// should change instantly and smoothly without layering.
-register('sine-440', s => {
-  // `s.state[0]` is our persistent phase value.
-  // s.state[0] = (s.state[0] + 222 / s.sr) % 1.0;
-  return Math.sin(666 * Math.PI * s.t) * 0.5;
-});
+// This is a simple, stateless oscillator function.
+// It doesn't need to manage its own state because it's a pure function of time.
+const pureSine = freq => s => Math.sin(freq * Math.PI * 2 * s.t);
+
+
+// --- Signal 1: A simple filtered sine wave ---
+
+// Reset the helper counter before registering a new signal chain.
+resetHelperCounter();
+register('filtered-sine',
+  lowpass(
+    gain(
+      pureSine(220),
+      0.5
+    ),
+    // The cutoff can be a dynamic function!
+    s => 200 + (100 * (Math.sin(s.t * 2) + 1))
+  )
+);
+
+
+// --- Signal 2: A complex, composed signal with multiple stateful helpers ---
+
+// Reset the counter again for this completely separate signal chain.
+resetHelperCounter();
+
+// This is a stateful oscillator that we can use inside the chain.
+const statefulOsc = (s, freq) => {
+    // This is our USER state. It's safe to use index 0 here because the
+    // helpers manage their own state slots automatically.
+    s.state[0] = (s.state[0] + freq / s.sr) % 1.0;
+    return Math.sin(s.state[0] * 2 * Math.PI);
+};
+
+// Refactored using `pipe` for a clean, linear signal chain.
+// The `pipe` function takes the base signal as its first argument,
+// and then a sequence of "transformer" functions.
+register('complex-drone',
+  pipe(
+    s => statefulOsc(s, 110), // 1. Start with our base oscillator.
+
+    // 2. Pipe it into the first (inner) tremolo.
+    //    Each of these functions receives the signal from the previous line.
+    signal => tremolo(signal, 0.5, 0.9),
+
+    // 3. Pipe the result into a lowpass filter.
+    signal => lowpass(signal, 200),
+
+    // 4. Pipe the result into the second (outer) tremolo.
+    signal => tremolo(signal, 2, 0.5),
+
+    // 5. Pipe into a gain stage.
+    signal => gain(signal, 0.3),
+
+    // 6. Finally, pipe into the stereo panner.
+    signal => pan(signal, s => Math.sin(s.t * 0.1))
+  )
+);
