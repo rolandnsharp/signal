@@ -1,87 +1,43 @@
-// live-session.js - Live Coding Interface for LEL
-// This file is watched by `bun --hot`. When you save, the whole
-// engine reloads, and this file is re-run.
+// live-session.js - `lel` Startup Script / Example Showcase
+// This file is loaded once when the `lel` engine starts.
+// Use the REPL to interact with the engine live (e.g., `register(...)`, `unregister(...)`).
 
-import { register, clear } from './index.js';
-// Import the new helpers, including the essential `resetHelperCounter` and `pipe`
-import { gain, pan, tremolo, lowpass, delay, resetHelperCounter, pipe } from './helpers.js';
+// All functions exported by helpers.js are globally available here (e.g., `gain`, `tremolo`).
+// The engine's core API (`register`, `unregister`, `clear`, `setPosition`) are also global.
 
-// Clear all signal functions on every reload.
-clear();
+// Clear any existing signals from a previous hot-reload (if running in `--hot` mode during dev).
+clear(true); // Full reset for a clean start
 
-// This is a simple, stateless oscillator function.
-// It doesn't need to manage its own state because it's a pure function of time.
-const pureSine = freq => s => Math.sin(freq * Math.PI * 2 * s.t);
-
-
-// --- Signal 1: A simple filtered sine wave ---
-
-// Reset the helper counter before registering a new signal chain.
-resetHelperCounter();
-register('filtered-sine',
-  lowpass(
-    gain(
-      pureSine(220),
-      0.5
-    ),
-    // The cutoff can be a dynamic function!
-    s => 200 + (100 * (Math.sin(s.t * 2) + 1))
-  )
-);
-
-
-// --- Signal 2: A complex, composed signal with multiple stateful helpers ---
-
-// Reset the counter again for this completely separate signal chain.
-resetHelperCounter();
-
-// This is a stateful oscillator that we can use inside the chain.
-const statefulOsc = (s, freq) => {
-    // This is our USER state. It's safe to use index 0 here because the
-    // helpers manage their own state slots automatically.
-    s.state[0] = (s.state[0] + freq / s.sr) % 1.0;
-    return Math.sin(s.state[0] * 2 * Math.PI);
+// --- Helper Oscillator for Examples ---
+// This is a simple, stateful oscillator. Note how it uses its own s.state[0]
+// as the helpers now manage their memory from a separate pool.
+const userOsc = (freq, phaseSlot = 0) => s => {
+    s.state[phaseSlot] = (s.state[phaseSlot] + freq / s.sr) % 1.0;
+    return Math.sin(s.state[phaseSlot] * 2 * Math.PI);
 };
 
-// Refactored using `pipe` for a clean, linear signal chain.
-// // The `pipe` function takes the base signal as its first argument,
-// // and then a sequence of "transformer" functions.
-register('complex-drone',
+
+// --- Example 1: Simple Filtered & Delayed Sine Wave ---
+// This showcases composition with stateful and stateless helpers.
+// The helpers manage their state automatically.
+register('filtered-delayed-sine',
   pipe(
-    s => statefulOsc(s, 555), // 1. Start with our base oscillator.
-
-    // 2. Pipe it into the first (inner) tremolo.
-    //    Each of these functions receives the signal from the previous line.
-    signal => tremolo(signal, 0.5, 0.9),
-
-    // 3. Pipe the result into a lowpass filter.
-    signal => lowpass(signal, 200),
-
-    // 4. Pipe the result into the second (outer) tremolo.
-    signal => tremolo(signal, 2, 0.5),
-
-    // 5. Pipe into a gain stage.
-    signal => gain(signal, 0.3),
-
-    // 6. Finally, pipe into the stereo panner.
-    signal => pan(signal, s => Math.sin(s.t * 2))
+    userOsc(440), // Base oscillator at 440Hz
+    signal => lowpass(signal, 800), // Lowpass filter at 800Hz
+    signal => tremolo(signal, 5, 0.8), // Tremolo: 5Hz rate, 80% depth
+    signal => delay(signal, 0.5, 0.25), // Delay: max 0.5s, actual 0.25s
+    signal => gain(signal, 0.4) // Overall gain
   )
 );
 
 
-// // --- Signal 3: A Delayed Sine Wave ---
+// --- Example 2: Another Independent Signal Chain ---
+register('panning-osc',
+  pipe(
+    userOsc(220), // Base oscillator at 220Hz
+    signal => gain(signal, 0.5), // Gain
+    signal => pan(signal, s => Math.sin(s.t * 0.1)) // Pan LFO
+  )
+);
 
-// // Reset the counter for this new, independent signal chain.
-// resetHelperCounter();
-
-// register('delayed-sine',
-//   pipe(
-//     pureSine(440), // Input signal: a pure sine wave
-
-//     // Apply a delay. maxTime sets the buffer size.
-//     // The actual delay time can be dynamic.
-//     signal => delay(signal, 10.11, 0.125), // Max 0.5s delay, actual 0.25s
-
-//     signal => gain(signal, 0.4) // Apply some gain
-//   )
-// );
+console.log("Initial signals loaded from live-session.js. Use REPL to explore!");

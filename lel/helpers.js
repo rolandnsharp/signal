@@ -12,19 +12,21 @@
  * HOW IT WORKS (The "Implicitly Persistent" Core):
  * 1. A global `slotMap` on `globalThis` stores the STARTING ADDRESS for the
  *    state block allocated to each helper instance. This map persists across
- *    hot-reloads.
+ *    hot-reloads (or rather, is explicitly managed by the REPL commands).
  * 2. `claimStateBlock()` generates a stable, REPL-safe key (e.g., "signal-name_helper-type_0").
- *    On the first run, it allocates a block of state (`blockSize`) from the
- *    global `nextSlot` pool and saves the starting address to the map.
- *    On subsequent hot-reloads, it instantly retrieves the already-saved address.
- * 3. `resetHelperCounter()` MUST be called immediately before every `register()`
- *    call in `live-session.js` to ensure the per-signal `helperIndex` is stable.
+ *    On the first call for a given helper instance, it allocates a block of
+ *    state (`totalBlockSize`) from the global `nextSlot` pool and saves the
+ *    starting address to the map.
+ *    On subsequent calls, it instantly retrieves the already-saved address.
+ * 3. The `helperCounter` (used to generate the stable key) is managed by the
+ *    `register` function in `index.js`, which calls `resetHelperCounterInternal()`
+ *    before processing each new signal chain.
  *
  *
  * HOW IT WORKS (The "Multichannel Expansion" via `expand()`):
  * 1. The `expand` higher-order function wraps a simple `_mono` helper function.
  *    It now accepts `slotsPerChannel` as a fixed number OR a function that calculates
- *    it dynamically based on the helper's arguments.
+ *    it dynamically based on the helper's arguments (`(...args) => numSlots`).
  * 2. When an `expand()`ed helper is called (e.g., `lowpass(osc, 800)`),
  *    `expand` first runs its input signal to determine `numChannels` (stride).
  * 3. It then calculates the total `blockSize` required (`numChannels * currentSlotsPerChannel`).
@@ -37,25 +39,22 @@
  *   - `live-session.js` code is beautifully terse.
  *   - Helpers are fully composable and automatically adapt to mono/stereo/etc.
  *   - Performance is maximal (zero-GC in hot path).
- *   - State persists across hot-reloads and is REPL-safe.
+ *   - State persists for the lifetime of the registered signal.
  *   - Dynamic buffer sizes for helpers like `delay` are handled elegantly.
  */
 
 // This object holds the persistent state for the helpers themselves.
-globalThis.LEL_HELPER_STATE ??= {
-    nextSlot: 0,
-    slotMap: new Map()
-};
+globalThis.LEL_HELPER_MEMORY ??= new Float64Array(65536); // Dedicated pool for helpers
+globalThis.LEL_HELPER_SLOT_MAP ??= new Map();
+globalThis.LEL_HELPER_NEXT_SLOT ??= 0;
 
 // This is the per-signal-chain counter. It is NOT persistent.
 let helperCounter = 0;
 
 /**
- * Resets the per-signal helper counter. This MUST be called immediately
- * before every `register()` call in `live-session.js` to ensure stable
- * keys for stateful helpers.
+ * Internally resets the per-signal helper counter. Called by `register` in `index.js`.
  */
-export function resetHelperCounter() {
+export function resetHelperCounterInternal() {
     helperCounter = 0;
 }
 
@@ -70,18 +69,17 @@ export function resetHelperCounter() {
  */
 function claimStateBlock(s, helperName, helperIndex, totalBlockSize) {
     const helperKey = `${s.name}_${helperName}_${helperIndex}`;
-    if (!globalThis.LEL_HELPER_STATE.slotMap.has(helperKey)) {
-        const startAddr = globalThis.LEL_HELPER_STATE.nextSlot;
-        globalThis.LEL_HELPER_STATE.slotMap.set(helperKey, startAddr);
-        globalThis.LEL_HELPER_STATE.nextSlot += totalBlockSize;
+    if (!globalThis.LEL_HELPER_SLOT_MAP.has(helperKey)) {
+        const startAddr = globalThis.LEL_HELPER_NEXT_SLOT;
+        globalThis.LEL_HELPER_SLOT_MAP.set(helperKey, startAddr);
+        globalThis.LEL_HELPER_NEXT_SLOT += totalBlockSize;
         // Safety check: Ensure we don't exceed the total allocated state for this signal.
-        // s.state.length is the SLOTS_PER_SIGNAL from index.js
-        if (globalThis.LEL_HELPER_STATE.nextSlot > s.state.length) {
-            console.error(`[FATAL] Out of state memory for signal "${s.name}". Helper "${helperName}" failed to allocate ${totalBlockSize} slots. Total available: ${s.state.length}. Needed: ${globalThis.LEL_HELPER_STATE.nextSlot}.`);
+        if (globalThis.LEL_HELPER_NEXT_SLOT > globalThis.LEL_HELPER_MEMORY.length) {
+            console.error(`[FATAL] Out of HELPER state memory for signal "${s.name}". Helper "${helperName}" failed to allocate ${totalBlockSize} slots. Total available: ${globalThis.LEL_HELPER_MEMORY.length}. Needed: ${globalThis.LEL_HELPER_NEXT_SLOT}.`);
         }
         return startAddr;
     }
-    return globalThis.LEL_HELPER_STATE.slotMap.get(helperKey);
+    return globalThis.LEL_HELPER_SLOT_MAP.get(helperKey);
 }
 
 /**
@@ -113,11 +111,11 @@ function expand(monoLogicFn, helperName, slotsPerChannelSpecifier = 1) {
                 const output = [];
                 for (let i = 0; i < numChannels; i++) {
                     const baseAddrForThisChannel = startAddrOfInstance + (i * currentSlotsPerChannel);
-                    output[i] = monoLogicFn(s, input[i], baseAddrForThisChannel, i, ...args);
+                    output[i] = monoLogicFn(s, input[i], globalThis.LEL_HELPER_MEMORY, baseAddrForThisChannel, i, ...args);
                 }
                 return output;
             } else {
-                return monoLogicFn(s, input, startAddrOfInstance, 0, ...args);
+                return monoLogicFn(s, input, globalThis.LEL_HELPER_MEMORY, startAddrOfInstance, 0, ...args);
             }
         };
     };
@@ -135,28 +133,28 @@ export const pipe = (x, ...fns) => fns.reduce((v, f) => f(v), x);
 // ============================================================================
 
 // --- Tremolo Helper Logic ---
-const tremolo_mono = (s, input, baseAddrForThisChannel, chan, rate, depth) => {
+const tremolo_mono = (s, input, helperMemory, baseAddrForThisChannel, chan, rate, depth) => {
     // LFO phase is shared across channels for a single tremolo instance.
     if (chan === 0) { // Only update LFO phase once per sample, on the first channel
         const phaseSlot = baseAddrForThisChannel + 0; // Use the first slot of this channel's allocated block
-        s.state[phaseSlot] = (s.state[phaseSlot] + rate / s.sr) % 1.0;
+        helperMemory[phaseSlot] = (helperMemory[phaseSlot] + rate / s.sr) % 1.0;
     }
     const lfoPhaseSlot = baseAddrForThisChannel + 0; // Access the (shared) LFO phase
-    const lfo = (Math.sin(s.state[lfoPhaseSlot] * 2 * Math.PI) + 1) * 0.5;
+    const lfo = (Math.sin(helperMemory[lfoPhaseSlot] * 2 * Math.PI) + 1) * 0.5;
     const mod = 1 - depth + lfo * depth; // The amplitude modulator
     return input * mod;
 };
-export const tremolo = expand(tremolo_mono, 'tremolo', 1); // Tremolo needs 1 slot per channel for its LFO phase.
+export const tremolo = expand(tremolo_mono, 'tremolo', 1); // Tremolo needs 1 slot per instance.
 
 
 // --- Lowpass Filter Helper Logic ---
-const lowpass_mono = (s, input, baseAddrForThisChannel, chan, cutoff) => {
+const lowpass_mono = (s, input, helperMemory, baseAddrForThisChannel, chan, cutoff) => {
     const z1Slot = baseAddrForThisChannel + 0; // The single z1 slot for this channel
     const cutoffFn = typeof cutoff === 'function' ? cutoff : () => cutoff;
     const alpha = cutoffFn(s) / s.sr;
-    const z1 = s.state[z1Slot] || 0; // Initialize z1 to 0 if first run
+    const z1 = helperMemory[z1Slot] || 0; // Initialize z1 to 0 if first run
     const output = z1 + alpha * (input - z1);
-    s.state[z1Slot] = output; // Store the new z1
+    helperMemory[z1Slot] = output; // Store the new z1
     return output;
 };
 export const lowpass = expand(lowpass_mono, 'lowpass', 1); // Lowpass needs 1 slot per channel for its z1 state.
@@ -164,7 +162,7 @@ export const lowpass = expand(lowpass_mono, 'lowpass', 1); // Lowpass needs 1 sl
 
 // --- Delay Helper Logic ---
 // Requires dynamic memory allocation: 1 slot for cursor + bufferSize for the delay buffer.
-const delay_mono = (s, input, baseAddrForThisChannel, chan, maxTime, time) => {
+const delay_mono = (s, input, helperMemory, baseAddrForThisChannel, chan, maxTime, time) => {
     const bufferLength = Math.floor(maxTime * s.sr); // Buffer size for THIS channel
     const cursorSlot = baseAddrForThisChannel + 0; // Cursor at the start of this channel's block
     const channelBufferStart = baseAddrForThisChannel + 1; // Actual buffer starts after cursor
@@ -172,18 +170,18 @@ const delay_mono = (s, input, baseAddrForThisChannel, chan, maxTime, time) => {
     const timeFn = typeof time === 'function' ? time : () => time;
     const delaySamples = Math.min(bufferLength - 1, Math.floor(timeFn(s) * s.sr));
     
-    let writeCursor = Math.floor(s.state[cursorSlot]);
+    let writeCursor = Math.floor(helperMemory[cursorSlot]);
     if (isNaN(writeCursor) || writeCursor < 0 || writeCursor >= bufferLength) writeCursor = 0; // Initialize/clamp cursor
 
     // Write the incoming signal to the buffer (into its dedicated channel buffer)
-    s.state[channelBufferStart + writeCursor] = input;
+    helperMemory[channelBufferStart + writeCursor] = input;
 
     // Calculate the read position and get the delayed signal
     const readCursor = (writeCursor - delaySamples + bufferLength) % bufferLength;
-    const output = s.state[channelBufferStart + readCursor];
+    const output = helperMemory[channelBufferStart + readCursor];
     
     // Advance the write cursor for the next sample
-    s.state[cursorSlot] = (writeCursor + 1) % bufferLength;
+    helperMemory[cursorSlot] = (writeCursor + 1) % bufferLength;
 
     return output;
 };
