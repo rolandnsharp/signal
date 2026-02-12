@@ -1,4 +1,4 @@
-// Aether DSP - Universal, Stride-Agnostic Signal Processors
+// Aither DSP - Universal, Stride-Agnostic Signal Processors
 
 /**
  * ============================================================================

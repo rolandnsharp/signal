@@ -4,7 +4,7 @@
 
 ## Overview
 
-The universe state object `s` is the single parameter passed to every signal function in Aether. It contains everything a signal needs to generate sound: time, position, sample rate, and persistent state memory.
+The universe state object `s` is the single parameter passed to every signal function in Aither. It contains everything a signal needs to generate sound: time, position, sample rate, and persistent state memory.
 
 ```javascript
 f(s) → sample
@@ -329,7 +329,7 @@ register('physis', s => {
 });
 ```
 
-### Chora (Aether ✨) - Spatial
+### Chora (Aither ✨) - Spatial
 
 **Uses:** `s.position`, `s.t`
 
@@ -379,4 +379,4 @@ The `s` object is created once and reused. No allocations in the audio loop.
 
 ---
 
-*"The state object is the universe. Your function observes it and produces sound."* — Aether
+*"The state object is the universe. Your function observes it and produces sound."* — Aither

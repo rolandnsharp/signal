@@ -310,7 +310,7 @@ kanon('tesla-impulse', t => {
 
 ---
 
-## Synthesis Technique 5: Aether Density Modulation
+## Synthesis Technique 5: Aither Density Modulation
 
 ### Tesla's Concept
 
@@ -332,7 +332,7 @@ kanon('density-modulation', t => {
   const carrier_freq = 440;
   const modulator_freq = 5;
 
-  // "Aether density" oscillation
+  // "Aither density" oscillation
   const density = 1 + 0.5 * Math.sin(2 * Math.PI * modulator_freq * t);
 
   // Wave propagation through varying density
@@ -688,7 +688,7 @@ Whether or not the aether exists, the mathematics is:
 - **Tesla coil organ**: Each note is a resonant coil mode
 - **Compression sequencer**: Sequence density variations
 - **Longitudinal modulation**: Modulate propagation speed
-- **Aether interference**: Standing wave patterns in space
+- **Aither interference**: Standing wave patterns in space
 - **Radiant pulses**: Sharp impulse excitation
 
 ---

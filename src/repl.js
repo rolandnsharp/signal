@@ -1,5 +1,5 @@
 #!/usr/bin/env bun
-// repl.js - Interactive REPL client for the Aether audio engine.
+// repl.js - Interactive REPL client for the Aither audio engine.
 // Usage: aether repl
 
 import dgram from 'dgram';
@@ -15,12 +15,12 @@ const client = dgram.createSocket('udp4');
 const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout,
-  prompt: 'aether> '
+  prompt: 'aither> '
 });
 
 // Banner
 console.log('\n╔═══════════════════════════════════════════╗');
-console.log('║      Aether Live REPL - Interactive      ║');
+console.log('║      Aither Live REPL - Interactive      ║');
 console.log('╚═══════════════════════════════════════════╝\n');
 console.log(`Sending to: ${REPL_HOST}:${REPL_PORT}`);
 console.log('Type JavaScript code to send to the audio engine.');
@@ -164,7 +164,7 @@ rl.on('close', () => {
 // Handle errors
 client.on('error', (err) => {
   console.error(`\n✗ UDP Client error: ${err.message}`);
-  console.error('Is the Aether server running? (aether start)');
+  console.error('Is the Aither server running? (aither start)');
 });
 
 // Start the REPL

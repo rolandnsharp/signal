@@ -1,13 +1,13 @@
 # The Five Elements: Philosophy of Unified Synthesis
 
 > *"One interface. Five paradigms. All things are number. All things flow."*
-> — Pythagoras meets Heraclitus in the Aether
+> — Pythagoras meets Heraclitus in the Aither
 
 ## The Fundamental Question
 
 Can we capture the **eternal geometry** of sound (Pythagoras) while enabling **live surgical manipulation** (Heraclitus)?
 
-The answer is **yes** — with a **single, unified interface** that naturally expresses five different paradigms. Different musical ideas require different levels of abstraction. Aether provides **five fundamental synthesis paradigms** (Arche), each representing a different way of thinking about the same `f(s)` interface.
+The answer is **yes** — with a **single, unified interface** that naturally expresses five different paradigms. Different musical ideas require different levels of abstraction. Aither provides **five fundamental synthesis paradigms** (Arche), each representing a different way of thinking about the same `f(s)` interface.
 
 ---
 
@@ -21,7 +21,7 @@ The answer is **yes** — with a **single, unified interface** that naturally ex
 | **Rhythmos** | Earth 🌍 | `s.state`, `s.sr` | Solid, predictable, phase-continuous | Oscillators, envelopes, smooth live coding |
 | **Atomos** | Air 💨 | `s.state`, `s.dt` | Discrete, generative, emergent | Granular synthesis, particle systems, stochastic textures |
 | **Physis** | Water 💧 | `s.state`, `s.dt` | Physical, organic, natural | String models, waveguides, resonators |
-| **Chora** | Aether ✨ | `s.position`, `s.t` | Spatial, resonant, holistic | Reverbs, spatial audio, field interactions |
+| **Chora** | Aither ✨ | `s.position`, `s.t` | Spatial, resonant, holistic | Reverbs, spatial audio, field interactions |
 
 ---
 
@@ -56,7 +56,7 @@ Both views are true. Both are necessary.
 - **Kanon without Rhythmos** is mathematics without music
 - **Rhythmos without Kanon** is sound without soul
 
-Aether lets you use **both simultaneously**—and three other paradigms that bridge the gap.
+Aither lets you use **both simultaneously**—and three other paradigms that bridge the gap.
 
 ---
 
@@ -80,9 +80,9 @@ Each is powerful but constraining. What if you want:
 
 **All in the same composition?**
 
-### The Aether Solution
+### The Aither Solution
 
-Aether provides **one universal interface** that naturally expresses five paradigms:
+Aither provides **one universal interface** that naturally expresses five paradigms:
 
 ```javascript
 // All signals use f(s) → sample
@@ -188,11 +188,11 @@ Kanon.register('harmony',
 
 **Inspiration**: Think **plucked strings**, **blown tubes**, **struck membranes**.
 
-### ✨ Chora (Aether) — The Spatial Field
+### ✨ Chora (Aither) — The Spatial Field
 
 **Signature**: `field(state)` *(Coming soon)*
 
-**Philosophy**: Aether (Chora—Greek for "space") is **spatial, holistic, and resonant**. Sound exists in a **field**—reverbs, room acoustics, wavefield synthesis. Space itself becomes an instrument.
+**Philosophy**: Aither (Chora—Greek for "space") is **spatial, holistic, and resonant**. Sound exists in a **field**—reverbs, room acoustics, wavefield synthesis. Space itself becomes an instrument.
 
 **When to use**:
 - Reverb and spatial effects
@@ -311,7 +311,7 @@ Pythagoras discovered harmony using the **monochord**—a single vibrating strin
 - Divide at 2:3 → Perfect Fifth
 - Divide at 3:4 → Perfect Fourth
 
-In Aether:
+In Aither:
 - **Your state array is the monochord string**
 - **Phase accumulation is continuous vibration**
 - **Hot-reload adjusts tension while the string plays**
@@ -321,7 +321,7 @@ But Pythagoras also knew:
 - The **ratios** (Kanon—Fire) are eternal
 - The **string** (Rhythmos—Earth) manifests them
 - The **air** (Atomos—Air) carries them
-- The **resonance** (Chora—Aether) amplifies them
+- The **resonance** (Chora—Aither) amplifies them
 
 All five elements working together create the Music of the Spheres.
 
@@ -342,7 +342,7 @@ All five elements working together create the Music of the Spheres.
 **Advanced**:
 - Add Atomos (Air) for emergent textures
 - Add Physis (Water) for organic instruments
-- Add Chora (Aether) for spatial effects
+- Add Chora (Aither) for spatial effects
 
 ### Decision Tree
 
@@ -359,7 +359,7 @@ All five elements working together create the Music of the Spheres.
 → Use **Physis** (Water 💧)
 
 **Do you need spatial effects and reverb?**
-→ Use **Chora** (Aether ✨)
+→ Use **Chora** (Aither ✨)
 
 **Not sure?**
 → Start with Rhythmos. It's the most versatile.
@@ -376,17 +376,17 @@ All five elements working together create the Music of the Spheres.
 
 4. **Physis (Water)**: The organic flow. Physics simulation yields natural, familiar sounds.
 
-5. **Chora (Aether)**: The spatial field. Space itself resonates, amplifies, transforms.
+5. **Chora (Aither)**: The spatial field. Space itself resonates, amplifies, transforms.
 
 **Together**, they form a complete system for sonic exploration.
 
 ---
 
-## IX. The Aether Engineering Principle
+## IX. The Aither Engineering Principle
 
 > *"One interface. Five paradigms. The monochord never stopped vibrating. It just evolved."*
 
-Aether provides a single interface that naturally expresses **five complementary ways** to think about sound:
+Aither provides a single interface that naturally expresses **five complementary ways** to think about sound:
 
 - As eternal geometry (Kanon: `s.t`)
 - As living process (Rhythmos: `s.state`, `s.sr`)
@@ -398,7 +398,7 @@ Use one, use all five, mix them freely. They're all just `f(s)` functions.
 
 The engine doesn't judge—it just renders.
 
-**Welcome to the Aether.**
+**Welcome to the Aither.**
 
 ---
 

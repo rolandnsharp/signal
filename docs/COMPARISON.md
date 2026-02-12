@@ -1,6 +1,6 @@
-# Aether in Context: Comparison with Other Systems
+# Aither in Context: Comparison with Other Systems
 
-> *Understanding Aether's place in the live coding and audio synthesis ecosystem*
+> *Understanding Aither's place in the live coding and audio synthesis ecosystem*
 
 ## The Live Coding Landscape
 
@@ -34,7 +34,7 @@ The established live coding systems each have their own strengths and focus area
 
 ---
 
-## What Makes Aether Unique
+## What Makes Aither Unique
 
 ### 1. True Paradigm Unification
 
@@ -65,7 +65,7 @@ const chaos = s => {
   return s.lorenz.x;
 };
 
-// Spatial field (Chora - Aether ✨)
+// Spatial field (Chora - Aither ✨)
 const spatial = s => {
   const { x, y, z } = s.position;
   const distance = Math.sqrt(x*x + y*y + z*z);
@@ -137,7 +137,7 @@ This is **pragmatic FP**: pure when you want it, stateful when you need it. Not 
 **Comparison:**
 - **Haskell/Faust**: Purely functional, but harder to express stateful synthesis
 - **SuperCollider**: Stateful by default, but less compositional
-- **Aether**: Best of both - pure interface, flexible implementation
+- **Aither**: Best of both - pure interface, flexible implementation
 
 ---
 
@@ -151,7 +151,7 @@ This is **pragmatic FP**: pure when you want it, stateful when you need it. Not 
 - Sonic Pi = Ruby
 - Extempore = Scheme
 
-**Aether = JavaScript + Bun**
+**Aither = JavaScript + Bun**
 
 **Why JavaScript:**
 - Accessible (everyone knows it)
@@ -178,12 +178,12 @@ See [Spatial Synthesis](paradigms/chora/spatial-synthesis.md) for deep dive.
 [Generate Signal] → [Spatialize] → [Decode for Speakers]
 ```
 
-**Aether approach:**
+**Aither approach:**
 ```
 [Listener Position] → [Field Evaluation] → [Sound Emerges]
 ```
 
-In Aether, sound doesn't exist until you query the field at a position. It's not "a sound placed in space" - it's **a field that generates sound based on where you are**.
+In Aither, sound doesn't exist until you query the field at a position. It's not "a sound placed in space" - it's **a field that generates sound based on where you are**.
 
 This enables:
 - Wave propagation simulation
@@ -196,14 +196,14 @@ This enables:
 
 ### 6. Philosophical Depth
 
-Most systems are **pragmatic tools**. Aether has **conceptual depth**.
+Most systems are **pragmatic tools**. Aither has **conceptual depth**.
 
 **The Five Elements:**
 - 🔥 **Kanon** (Fire) - Pure mathematical ideal, Platonic form
 - 🌍 **Rhythmos** (Earth) - Grounded, stateful, explicit
 - 💨 **Atomos** (Air) - Discrete, granular, emergent
 - 💧 **Physis** (Water) - Flowing, physics-based, continuous transformation
-- ✨ **Chora** (Aether) - Spatial, omnipresent, field-based
+- ✨ **Chora** (Aither) - Spatial, omnipresent, field-based
 
 This isn't just branding - it maps to **real synthesis paradigms** with **philosophical grounding** in ancient Greek thought.
 
@@ -211,7 +211,7 @@ This isn't just branding - it maps to **real synthesis paradigms** with **philos
 
 ## Comparison Matrix
 
-| Feature | SuperCollider | TidalCycles | Sonic Pi | Aether |
+| Feature | SuperCollider | TidalCycles | Sonic Pi | Aither |
 |---------|--------------|-------------|----------|---------|
 | **Paradigm Unity** | Separated | Pattern-only | Opinionated | Unified `f(s)` |
 | **Universal Helpers** | No | No | Limited | Yes |
@@ -227,17 +227,17 @@ This isn't just branding - it maps to **real synthesis paradigms** with **philos
 
 ---
 
-## What Aether is NOT Trying to Do
+## What Aither is NOT Trying to Do
 
-**Aether is not trying to replace SuperCollider.** SuperCollider is the most mature and powerful live coding synthesis system, with decades of development and a massive community.
+**Aither is not trying to replace SuperCollider.** SuperCollider is the most mature and powerful live coding synthesis system, with decades of development and a massive community.
 
-**Aether asks a different question:**
+**Aither asks a different question:**
 
 > "What if we started fresh with modern tools and unified everything?"
 
 **SuperCollider explores depth within paradigms.**
 
-**Aether explores unification across paradigms.**
+**Aither explores unification across paradigms.**
 
 Both are valuable. Both have their place.
 
@@ -266,13 +266,13 @@ Individual features exist elsewhere:
 
 ## Why It Matters
 
-Aether isn't just building "another audio engine." It's asking:
+Aither isn't just building "another audio engine." It's asking:
 
 > **"What if we stopped thinking in paradigms and started thinking in transformations?"**
 
 That's profound. And the fact that it **actually works** - that the same `lowpass()` works on pure functions, physics sims, chaos attractors, AND spatial fields - proves the abstraction is real.
 
-The live coding community needs fresh perspectives. Aether provides one.
+The live coding community needs fresh perspectives. Aither provides one.
 
 ---
 
@@ -285,4 +285,4 @@ The live coding community needs fresh perspectives. Aether provides one.
 
 ---
 
-*This isn't a competition. It's an exploration. SuperCollider remains the king. Aether is asking new questions.*
+*This isn't a competition. It's an exploration. SuperCollider remains the king. Aither is asking new questions.*

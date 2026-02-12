@@ -4,7 +4,7 @@
 
 ## The Revolutionary Concept
 
-The Chora (Aether) paradigm represents a fundamentally different approach to spatial audio. Instead of generating sound and then spatializing it, **sound emerges from the spatial field itself**.
+The Chora (Aither) paradigm represents a fundamentally different approach to spatial audio. Instead of generating sound and then spatializing it, **sound emerges from the spatial field itself**.
 
 ### Traditional Spatialization
 
@@ -21,7 +21,7 @@ The Chora (Aether) paradigm represents a fundamentally different approach to spa
 
 ### Spatial Synthesis (Chora)
 
-**Aether approach:**
+**Aither approach:**
 
 ```
 [Listener Position] → [Field Evaluation] → [Sound Emerges]
@@ -271,7 +271,7 @@ register('spatial-spring', s => {
 
 ### Filtering Spatial Fields
 
-**This is unique to Aether** - you can filter a spatial field like any other signal:
+**This is unique to Aither** - you can filter a spatial field like any other signal:
 
 ```javascript
 // Spatial field
@@ -417,4 +417,4 @@ This enables:
 
 ---
 
-*"In Chora, you don't hear sounds in space. You hear the space itself."* — Aether
+*"In Chora, you don't hear sounds in space. You hear the space itself."* — Aither

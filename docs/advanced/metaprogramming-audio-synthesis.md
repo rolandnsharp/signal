@@ -4,7 +4,7 @@
 
 ## Introduction
 
-Lisp's macros made it legendary for audio DSP (Incudine, SuperCollider). In Aether, we achieve **even more powerful** metaprogramming using JavaScript's modern features: template literals, function generation, proxies, and JIT compilation.
+Lisp's macros made it legendary for audio DSP (Incudine, SuperCollider). In Aither, we achieve **even more powerful** metaprogramming using JavaScript's modern features: template literals, function generation, proxies, and JIT compilation.
 
 ---
 
@@ -548,7 +548,7 @@ Rhythmos.register('evolving', (state, idx, sr) => {
 
 ## Summary: Why This is Revolutionary
 
-| Feature | Lisp Macros | Aether Metaprogramming |
+| Feature | Lisp Macros | Aither Metaprogramming |
 |---------|-------------|------------------------|
 | **When** | Compile-time | Runtime |
 | **Data-driven** | No | Yes (generate from MIDI, OSC, ML) |
@@ -558,7 +558,7 @@ Rhythmos.register('evolving', (state, idx, sr) => {
 | **Self-modification** | No | Yes (code analyzes itself and evolves) |
 
 **Lisp macros** = Code transformation at compile time
-**Aether metaprogramming** = **Living code that writes itself at runtime**
+**Aither metaprogramming** = **Living code that writes itself at runtime**
 
 You're not just building instruments. You're building **self-evolving sonic organisms**.
 

@@ -1,5 +1,5 @@
-// live-session.js - `lel` Startup Script / Example Showcase
-// This file is loaded once when the `lel` engine starts.
+// live-session.js - `aither` Startup Script / Example Showcase
+// This file is loaded once when the `aither` engine starts.
 // Use the REPL to interact with the engine live (e.g., `register(...)`, `unregister(...)`).
 
 // All functions exported by helpers.js are globally available here (e.g., `gain`, `tremolo`).

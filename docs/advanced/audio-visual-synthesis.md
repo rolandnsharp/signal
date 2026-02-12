@@ -91,7 +91,7 @@ render();
 ### Reading from Audio Output
 
 ```javascript
-import { Aether } from './src/arche/aether/index.js';
+import { Aither } from './src/arche/aether/index.js';
 
 // Create ring buffer for audio samples
 const bufferSize = 4096;
@@ -99,7 +99,7 @@ const ringBuffer = new Float32Array(bufferSize);
 let writeIndex = 0;
 
 // Hook into audio generation (in your audio callback)
-Aether.onSample((sample) => {
+Aither.onSample((sample) => {
   ringBuffer[writeIndex] = sample;
   writeIndex = (writeIndex + 1) % bufferSize;
 });
@@ -405,7 +405,7 @@ function renderRhythmosState() {
 }
 ```
 
-### Chora (Aether ✨): Spatial Field Visualization
+### Chora (Aither ✨): Spatial Field Visualization
 
 ```javascript
 // When Chora is implemented: visualize the spatial field
@@ -610,12 +610,12 @@ function renderAttractor() {
 
 ---
 
-## Integration with Aether
+## Integration with Aither
 
 ### Complete Example: Multi-View Oscilloscope
 
 ```javascript
-import { Aether } from './src/arche/aether/index.js';
+import { Aither } from './src/arche/aether/index.js';
 
 class MultiViewScope {
   constructor(canvasId) {
@@ -668,8 +668,8 @@ class MultiViewScope {
 // Initialize
 const scope = new MultiViewScope('oscilloscope');
 
-// Connect to Aether audio engine
-Aether.onAudioFrame((left, right, count) => {
+// Connect to Aither audio engine
+Aither.onAudioFrame((left, right, count) => {
   scope.pushSamples(left, right, count);
 });
 

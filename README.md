@@ -1,4 +1,4 @@
-# Aether - Multi-Paradigm Live Coding Engine
+# Aither - Multi-Paradigm Live Coding Engine
 
 > *"All things are number."* - Pythagoras
 
@@ -6,7 +6,7 @@ A multi-paradigm live-coding environment for sound synthesis. Edit JavaScript, s
 
 ## Philosophy
 
-**Aether** (Gr. Αἰθήρ) embodies the classical element that fills the universe, the pure essence that conveys all phenomena. Like the theoretical medium through which waves propagate, this engine treats your state array as the fabric of a sonic universe that never stops.
+**Aither** (Gr. αἰθήρ) embodies the classical element that fills the universe, the pure essence that conveys all phenomena. Like the theoretical medium through which waves propagate, this engine treats your state array as the fabric of a sonic universe that never stops.
 
 When you edit parameters, the sonic medium morphs seamlessly because its state persists across code changes. The monochord's string continues vibrating; only the tension changes.
 
@@ -14,7 +14,7 @@ When you edit parameters, the sonic medium morphs seamlessly because its state p
 
 ## The Five Paradigms (Arche)
 
-Aether supports five fundamental synthesis paradigms, each representing a different level of abstraction:
+Aither supports five fundamental synthesis paradigms, each representing a different level of abstraction:
 
 | Paradigm | Element | Signature | Concept |
 |----------|---------|-----------|---------|
@@ -22,7 +22,7 @@ Aether supports five fundamental synthesis paradigms, each representing a differ
 | **Kanon** | Fire 🔥 | `f(t)` | Pure functions of time |
 | **Atomos** | Air 💨 | `f(state, dt)` | Discrete generative processes |
 | **Physis** | Water 💧 | `flow(state)` | Physics simulation |
-| **Chora** | Aether ✨ | `field(state)` | Spatial resonance fields |
+| **Chora** | Aither ✨ | `field(state)` | Spatial resonance fields |
 
 Currently, **Rhythmos** is fully implemented. The others are coming soon.
 
@@ -60,7 +60,7 @@ The `aether` command starts the server. You can then interact with it using `aet
 │    ├── kanon/ (Fire 🔥)                  │
 │    ├── atomos/ (Air 💨)                  │
 │    ├── physis/ (Water 💧)                │
-│    └── chora/ (Aether ✨)                │
+│    └── chora/ (Aither ✨)                │
 ├───────────────────────────────────────────┤
 │  aether.js - Signal Registry              │  ← Paradigm-agnostic mixer
 ├───────────────────────────────────────────┤
@@ -75,7 +75,7 @@ The `aether` command starts the server. You can then interact with it using `aet
 ### Key Features
 
 - **Phase Continuity**: State persists in `globalThis.AETHER_STATE` during hot-reload
-- **Multi-Paradigm**: Mix Earth (Rhythmos), Fire (Kanon), Air (Atomos), Water (Physis), and Aether (Chora)
+- **Multi-Paradigm**: Mix Earth (Rhythmos), Fire (Kanon), Air (Atomos), Water (Physis), and Aither (Chora)
 - **Zero-Copy Architecture**: `subarray()` eliminates GC pauses
 - **Soft Clipping**: All signals auto-clipped with `Math.tanh()` for safety
 - **48kHz @ 32-bit float**: Native floating-point audio (no int16 quantization)
@@ -175,7 +175,7 @@ Rhythmos.register('vortex-morph', (mem, idx, sampleRate) => {
 
 ## Live Surgery Workflows
 
-Aether supports two primary workflows for live code manipulation.
+Aither supports two primary workflows for live code manipulation.
 
 ### Method 1: Interactive REPL (Recommended)
 
@@ -200,7 +200,7 @@ You can also send an entire file: `aether-client send my-session.js`.
 
 Classic workflow, powered by Bun's `--hot` flag.
 
-1.  **Start Aether with Hot-Reload**: `bun --hot src/index.js`
+1.  **Start Aither with Hot-Reload**: `bun --hot src/index.js`
 2.  **Open** `live-session.js` in your editor.
 3.  **Edit** a parameter (e.g., `Rhythmos.sin(440)` → `Rhythmos.sin(550)`).
 4.  **Save** (`:w` in Vim).
@@ -299,7 +299,7 @@ Remove a specific signal by ID.
   - **kanon/** - Fire 🔥 (pure time functions) - *Coming soon*
   - **atomos/** - Air 💨 (discrete processes) - *Coming soon*
   - **physis/** - Water 💧 (physics simulation) - *Coming soon*
-  - **chora/** - Aether ✨ (spatial fields) - *Coming soon*
+  - **chora/** - Aither ✨ (spatial fields) - *Coming soon*
 - **live-session.js** - **YOUR CODE** - Live-codeable signal definitions
 
 ## Technical Details
@@ -321,9 +321,9 @@ Different musical ideas require different levels of abstraction:
 - **Kanon** (Fire) - Pure mathematical beauty
 - **Atomos** (Air) - Generative, emergent textures
 - **Physis** (Water) - Organic, physically-modeled instruments
-- **Chora** (Aether) - Spatial acoustics and reverb
+- **Chora** (Aither) - Spatial acoustics and reverb
 
-Aether lets you use all five together in a single composition.
+Aither lets you use all five together in a single composition.
 
 ### The Monochord Philosophy
 
@@ -332,7 +332,7 @@ Pythagoras discovered that harmony is mathematical using the monochord - a singl
 - Divide at 2:3 = Perfect Fifth
 - Divide at 3:4 = Perfect Fourth
 
-In Aether:
+In Aither:
 - Your state array is the vibrating string
 - Phase accumulation is continuous vibration
 - Hot-reload adjusts tension while the string plays
@@ -342,7 +342,7 @@ In Aether:
 
 - **[AETHER_PARADIGMS.md](docs/AETHER_PARADIGMS.md)** - The Five Elements philosophy
 - **[SURGERY_GUIDE.md](docs/SURGERY_GUIDE.md)** - Live coding workflow
-- **[BEYOND-LISP.md](docs/BEYOND-LISP.md)** - How Aether transcends Lisp/Incudine
+- **[BEYOND-LISP.md](docs/BEYOND-LISP.md)** - How Aither transcends Lisp/Incudine
 - **[PERFORMANCE_OPTIMIZATION.md](docs/PERFORMANCE_OPTIMIZATION.md)** - Optimization strategies
 - **[AUDIO_BACKEND_ARCHITECTURE.md](docs/AUDIO_BACKEND_ARCHITECTURE.md)** - Backend design
 
@@ -359,7 +359,7 @@ In Aether:
 - [ ] Kanon paradigm (Fire 🔥)
 - [ ] Atomos paradigm (Air 💨)
 - [ ] Physis paradigm (Water 💧)
-- [ ] Chora paradigm (Aether ✨)
+- [ ] Chora paradigm (Aither ✨)
 - [ ] JACK FFI transport (PULL mode, <10ms latency)
 - [ ] 3D oscilloscope integration (STRIDE=4: XYZW)
 - [ ] Vim eval integration (select → send → eval)
@@ -383,4 +383,4 @@ MIT
 
 ---
 
-*"The monochord never stopped vibrating. It just evolved."* - Aether Engineering Principle
+*"The monochord never stopped vibrating. It just evolved."* - Aither Engineering Principle

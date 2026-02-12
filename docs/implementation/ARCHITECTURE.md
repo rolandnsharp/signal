@@ -1,8 +1,8 @@
-# The Aether Engine: Final Architecture (REPL-Driven)
+# The Aither Engine: Final Architecture (REPL-Driven)
 
 ## 1. Core Philosophy: An Imperative, Live Instrument
 
-This document outlines the final, definitive architecture for the Aether engine. After exploring complex, file-based hot-reloading models, we have embraced a simpler, more powerful, and more robust paradigm: **a REPL-driven, imperative live-coding environment.**
+This document outlines the final, definitive architecture for the Aither engine. After exploring complex, file-based hot-reloading models, we have embraced a simpler, more powerful, and more robust paradigm: **a REPL-driven, imperative live-coding environment.**
 
 The core principles are:
 -   The engine is a stable, long-running process.
@@ -65,7 +65,7 @@ This REPL-driven model is the standard for professional live-coding environments
 -   **Performant:** It retains all our hard-won Zero-GC and performance characteristics.
 -   **Expressive:** The live-coding experience is clean, while the REPL provides the power for dynamic, imperative performance.
 
-This is the final, correct architecture for Aether. It fulfills the vision in the most robust and professional way possible.
+This is the final, correct architecture for Aither. It fulfills the vision in the most robust and professional way possible.
 
 ## See Also
 

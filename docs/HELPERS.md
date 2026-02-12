@@ -1,10 +1,10 @@
-# Aether Helper Functions Reference
+# Aither Helper Functions Reference
 
 > *"Compose signals like sentences. Mix paradigms like colors."*
 
 ## Introduction
 
-Helpers are higher-order functions that transform and combine signals in the Aether engine. They work seamlessly with all five paradigms (Kanon, Rhythmos, Atomos, Physis, Chora) because everything uses the same `f(s)` interface.
+Helpers are higher-order functions that transform and combine signals in the Aither engine. They work seamlessly with all five paradigms (Kanon, Rhythmos, Atomos, Physis, Chora) because everything uses the same `f(s)` interface.
 
 **Core principles:**
 - **Universal**: All helpers work with any paradigm
@@ -53,7 +53,7 @@ register('five-elements',
     },
     atomosSignal,                                      // Atomos (Air)
     physisSignal,                                      // Physis (Water)
-    choraSignal                                        // Chora (Aether)
+    choraSignal                                        // Chora (Aither)
   )
 );
 
@@ -341,7 +341,7 @@ register('spring',
 );
 ```
 
-### Chora (Aether ✨) - Spatial Fields
+### Chora (Aither ✨) - Spatial Fields
 
 ```javascript
 // Spatial wave with effects
@@ -562,4 +562,4 @@ register('my-signal',
 
 ---
 
-*"The helper is not separate from the signal. The signal flows through the helper like water through stone."* — Aether
+*"The helper is not separate from the signal. The signal flows through the helper like water through stone."* — Aither

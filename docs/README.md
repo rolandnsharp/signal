@@ -1,8 +1,8 @@
-# Aether Documentation Wiki
+# Aither Documentation Wiki
 
 > *"All things are number. All things flow."* — The Five Elements of Sound
 
-Welcome to the Aether multi-paradigm audio synthesis documentation. This is a comprehensive wiki covering pure functional synthesis, mathematical foundations, esoteric sound theory, and the profound connections between music, physics, and philosophy.
+Welcome to the Aither multi-paradigm audio synthesis documentation. This is a comprehensive wiki covering pure functional synthesis, mathematical foundations, esoteric sound theory, and the profound connections between music, physics, and philosophy.
 
 ## Quick Navigation
 
@@ -19,7 +19,7 @@ Welcome to the Aether multi-paradigm audio synthesis documentation. This is a co
 | **[Kanon](paradigms/kanon/overview.md)** | Fire 🔥 | Pure `f(t)`, mathematical beauty | ✅ Implemented |
 | **[Atomos](paradigms/atomos/coming-soon.md)** | Air 💨 | Discrete events, emergent textures | 🚧 Coming Soon |
 | **[Physis](paradigms/physis/coming-soon.md)** | Water 💧 | Physics simulation, organic sounds | 🚧 Coming Soon |
-| **[Chora](paradigms/chora/coming-soon.md)** | Aether ✨ | Spatial fields, resonance | 🚧 Coming Soon |
+| **[Chora](paradigms/chora/coming-soon.md)** | Aither ✨ | Spatial fields, resonance | 🚧 Coming Soon |
 
 ### 🎛️ Synthesis Techniques
 - [Additive Synthesis](synthesis-techniques/additive-synthesis.md)
@@ -89,13 +89,13 @@ Welcome to the Aether multi-paradigm audio synthesis documentation. This is a co
 
 ## Philosophy
 
-**Aether** embodies the Pythagorean approach to sound synthesis:
+**Aither** embodies the Pythagorean approach to sound synthesis:
 - **Sound as eternal geometry** that exists timelessly
 - **Functions of time** reveal crystalline structures
 - **Divine proportions**: Golden Ratio (φ), perfect ratios (3:2, 4:3)
 - **"All is Number"** - the universe as pre-existing mathematical perfection
 
-But Aether also acknowledges Heraclitus:
+But Aither also acknowledges Heraclitus:
 - **"Everything flows"** - sound as a living process
 - **State and momentum** - phase continuity through hot-reload
 - **The river of fire** - signals with memory and inertia
@@ -110,19 +110,19 @@ See [PHILOSOPHY.md](PHILOSOPHY.md) for the complete vision.
 
 ### Multi-Paradigm Architecture
 
-Aether doesn't force you into a single way of thinking. It provides five complementary paradigms:
+Aither doesn't force you into a single way of thinking. It provides five complementary paradigms:
 
 - **Rhythmos (Earth 🌍)**: `f(state, sr)` - Solid, predictable, phase-continuous
 - **Kanon (Fire 🔥)**: `f(t)` - Pure, eternal, mathematically beautiful
 - **Atomos (Air 💨)**: `f(state, dt)` - Discrete, emergent, stochastic
 - **Physis (Water 💧)**: `flow(state)` - Physical, organic, resonant
-- **Chora (Aether ✨)**: `field(state)` - Spatial, holistic, reverberant
+- **Chora (Aither ✨)**: `field(state)` - Spatial, holistic, reverberant
 
 Each paradigm maintains **conceptual purity** while enabling **cross-paradigm composition**.
 
 ### The Monochord Philosophy
 
-Pythagoras discovered harmony using the monochord - a single vibrating string. In Aether:
+Pythagoras discovered harmony using the monochord - a single vibrating string. In Aither:
 - Your **state array is the string**
 - **Phase accumulation** is continuous vibration
 - **Hot-reload** adjusts tension while the string plays
@@ -177,7 +177,7 @@ Found an error or have an improvement? This is a living document that grows with
 - [Kanon (Fire)](paradigms/kanon/overview.md)
 - [Atomos (Air)](paradigms/atomos/coming-soon.md) - *Coming soon*
 - [Physis (Water)](paradigms/physis/coming-soon.md) - *Coming soon*
-- [Chora (Aether)](paradigms/chora/coming-soon.md) - *Coming soon*
+- [Chora (Aither)](paradigms/chora/coming-soon.md) - *Coming soon*
 
 ### Synthesis Techniques
 - [Additive Synthesis](synthesis-techniques/additive-synthesis.md)
@@ -213,4 +213,4 @@ Found an error or have an improvement? This is a living document that grows with
 
 **Welcome to the exploration of eternal harmonic truth.** 🎵
 
-*"The monochord never stopped vibrating. It just evolved."* - Aether Engineering Principle
+*"The monochord never stopped vibrating. It just evolved."* - Aither Engineering Principle

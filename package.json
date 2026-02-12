@@ -1,12 +1,12 @@
 {
-  "name": "aether",
+  "name": "aither",
   "module": "src/server.js",
   "type": "module",
   "bin": {
-    "aether": "./src/cli.js"
+    "aither": "./src/cli.js"
   },
   "scripts": {
-    "start": "aether start",
+    "start": "aither start",
     "dev": "bun src/server.js"
   },
   "devDependencies": {

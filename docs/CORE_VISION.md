@@ -1,8 +1,8 @@
-# Core Vision: The Aether Engine
+# Core Vision: The Aither Engine
 
-**This is the fundamental vision for the Aether project. All work must align with these principles.**
+**This is the fundamental vision for the Aither project. All work must align with these principles.**
 
-The goal is to create a universal instrument for live-coding audio synthesis. After exploring many complex ideas, we have successfully distilled them into a single, powerful, and simple abstraction. The Aether engine is the realization of this goal.
+The goal is to create a universal instrument for live-coding audio synthesis. After exploring many complex ideas, we have successfully distilled them into a single, powerful, and simple abstraction. The Aither engine is the realization of this goal.
 
 ## 1. The Core Abstraction: `f(s)` is Everything
 
@@ -39,9 +39,9 @@ The original vision outlined five paradigms (`Kanon`, `Rhythmos`, `Atomos`, `Phy
 
 -   **`Physis` (Water 💧):** Is the *philosophy* of writing a signal that models a physical object's laws.
 
--   **`Chora` (Aether ✨):** Is a function that uses `s.position` and `s.t` to model a wavefield.
+-   **`Chora` (Aither ✨):** Is a function that uses `s.position` and `s.t` to model a wavefield.
 
-The Aether engine, with its unified `f(s)` signature, **already supports all five paradigms.**
+The Aither engine, with its unified `f(s)` signature, **already supports all five paradigms.**
 
 ## 3. The Three Unbreakable Rules
 
@@ -61,7 +61,7 @@ This is the most complex and important design pattern we created. To keep live-c
 
 ## The Goal: Divine Simplicity
 
-The Aether engine is complete. The architecture is sound. Future work is about building a rich `helpers.js` library upon this foundation, not changing the foundation itself. Always prioritize expressive power and simplicity in live-coding over architectural complexity.
+The Aither engine is complete. The architecture is sound. Future work is about building a rich `helpers.js` library upon this foundation, not changing the foundation itself. Always prioritize expressive power and simplicity in live-coding over architectural complexity.
 
 ---
 

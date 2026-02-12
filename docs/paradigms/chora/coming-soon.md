@@ -1,4 +1,4 @@
-# Chora Paradigm (Aether ✨)
+# Chora Paradigm (Aither ✨)
 
 > *"Space is the receptacle of all becoming."* — Plato's Timaeus
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
-// send-repl.js - Send code files to the Aether REPL server.
-// Usage: aether send <path-to-your-snippet.js>
+// send-repl.js - Send code files to the Aither REPL server.
+// Usage: aither send <path-to-your-snippet.js>
 
 import dgram from 'dgram';
 import fs from 'fs';

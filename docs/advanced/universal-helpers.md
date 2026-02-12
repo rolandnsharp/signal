@@ -10,7 +10,7 @@ Because all five paradigms share the unified signature, we can create helpers th
 - 🌍 **Rhythmos** (Stateful) - `s => { s.phase += ...; return Math.sin(s.phase); }`
 - 💨 **Atomos** (Discrete) - `s => s.buffer[s.idx % period]`
 - 💧 **Physis** (Physics) - `s => { s.x += s.v * s.dt; return s.x; }`
-- ✨ **Aether** (Spatial) - `s => Math.sin(...) / (distance + 1)`
+- ✨ **Aither** (Spatial) - `s => Math.sin(...) / (distance + 1)`
 
 **The helpers don't care!** They just take `s => value` and return `s => transformedValue`.
 
@@ -100,7 +100,7 @@ Creates echoes regardless of source:
 const sine = s => Math.sin(2 * Math.PI * 220 * s.t);
 const echoPure = Zap.feedbackDelay(sine, 0.3, 0.6);
 
-// Echo a spatial field (Aether)
+// Echo a spatial field (Aither)
 const spatial = s => {
   const { x, y, z } = s.position;
   const distance = Math.sqrt(x*x + y*y + z*z);
@@ -152,7 +152,7 @@ import { Zap } from './src/arche/zap/index.js';
 
 // Start with ANY paradigm
 const source = s => {
-  // Could be Kanon, Rhythmos, Atomos, Physis, or Aether
+  // Could be Kanon, Rhythmos, Atomos, Physis, or Aither
   if (!s.phase) s.phase = 0;
   s.phase = (s.phase + 330 / s.sr) % 1.0;
   return s.phase * 2 - 1; // Sawtooth
@@ -230,7 +230,7 @@ const crossfaded = Zap.crossfade(
 
 ---
 
-## Spatial Processing (Aether + Helpers)
+## Spatial Processing (Aither + Helpers)
 
 Helpers work on spatial fields:
 
@@ -294,7 +294,7 @@ const water = s => {
   return s.vdp.x;
 };
 
-// 5. Aether (Ether) - Spatial
+// 5. Aither (Ether) - Spatial
 const aether = s => {
   const { x, y, z } = s.position;
   const distance = Math.sqrt(x*x + y*y + z*z);
@@ -387,7 +387,7 @@ These helpers embody the **essence of Zap**:
 
 > *One signature to rule them all*
 
-You don't need separate filter implementations for Kanon, Rhythmos, Atomos, Physis, and Aether. **One implementation works for all.**
+You don't need separate filter implementations for Kanon, Rhythmos, Atomos, Physis, and Aither. **One implementation works for all.**
 
 This is the power of abstraction. The paradigms are **unified**, not **isolated**.
 

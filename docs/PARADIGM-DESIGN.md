@@ -1,4 +1,4 @@
-# Aether: The Unified Audio Synthesis Engine
+# Aither: The Unified Audio Synthesis Engine
 
 > *"One interface. Five paradigms. Infinite expression."*
 
@@ -127,7 +127,7 @@ const physis = s => {
   return s.state[0] * 100;
 };
 
-// ✨ CHORA (Aether): Spatial wavefields - uses s.position
+// ✨ CHORA (Aither): Spatial wavefields - uses s.position
 const chora = s => {
   const dist = Math.sqrt(s.position.x**2 + s.position.y**2);
   return Math.sin(dist * 10 - s.t * 340) / (dist + 1);  // Wave propagation
@@ -485,7 +485,7 @@ const field = renderOnGPU(spatialFn, resolution);
 
 ## The Name
 
-**Aether** — The fifth element, the quintessence, the medium through which all signals propagate.
+**Aither** — The fifth element, the quintessence, the medium through which all signals propagate.
 
 One paradigm. Infinite possibility.
 
@@ -501,7 +501,7 @@ One paradigm. Infinite possibility.
 | **Rhythmos** | Earth 🌍 | `s.state`, `s.sr` (explicit state) | Oscillators, phase-continuous synthesis |
 | **Atomos** | Air 💨 | `s.state`, `s.dt` (discrete steps) | Granular synthesis, emergent processes |
 | **Physis** | Water 💧 | `s.dt` (physics laws) | Physical modeling, organic sounds |
-| **Chora** | Aether ✨ | `s.position` (spatial) | Reverb, spatial audio, wavefields |
+| **Chora** | Aither ✨ | `s.position` (spatial) | Reverb, spatial audio, wavefields |
 
 **You can mix all five in one composition.** They are expressive styles, not separate systems.
 
@@ -525,4 +525,4 @@ One interface. Five paradigms. Infinite expression.
 
 ---
 
-*"The five become one. The one expresses five."* — Aether
+*"The five become one. The one expresses five."* — Aither

@@ -11,7 +11,7 @@ This guide shows how to implement all five synthesis paradigms using Zap's unifi
 3. [Earth 🌍 - Rhythmos Patterns (Stateful)](#earth--rhythmos-patterns)
 4. [Air 💨 - Atomos Patterns (Discrete Events)](#air--atomos-patterns)
 5. [Water 💧 - Physis Patterns (Physics)](#water--physis-patterns)
-6. [Aether ✨ - Chora Patterns (Spatial)](#aether--chora-patterns)
+6. [Aither ✨ - Chora Patterns (Spatial)](#aether--chora-patterns)
 7. [Advanced Techniques](#advanced-techniques)
 8. [Performance Optimization](#performance-optimization)
 
@@ -571,7 +571,7 @@ Zap.register('duffing', s => {
 
 ---
 
-## Aether ✨ - Chora Patterns
+## Aither ✨ - Chora Patterns
 
 **Spatial synthesis.** Fields, wave propagation, position-dependent sound.
 
@@ -1114,7 +1114,7 @@ The `s => value` signature is universal because **s contains everything**:
 - **State** (mutate `s.*`) → Rhythmos (stateful)
 - **Sample index** (`s.idx`) → Atomos (discrete)
 - **Delta time** (`s.dt`) → Physis (physics integration)
-- **Position** (`s.position`) → Chora/Aether (spatial)
+- **Position** (`s.position`) → Chora/Aither (spatial)
 
 You don't need different paradigms. You need **one language** that speaks all dialects.
 

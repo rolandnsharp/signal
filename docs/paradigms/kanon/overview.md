@@ -6,7 +6,7 @@
 
 **Kanon** (κανών) - Ancient Greek for "rule" or "measuring rod" - was the monochord instrument Pythagoras used to discover that harmony is mathematical ratio.
 
-In Aether, **Kanon** represents the **pure functional paradigm**: sound as a stateless function that uses only time.
+In Aither, **Kanon** represents the **pure functional paradigm**: sound as a stateless function that uses only time.
 
 ### The Pythagorean View
 
@@ -21,7 +21,7 @@ Kanon treats sound as **eternal geometry** that exists timelessly. When you writ
 
 ## The Unified Interface
 
-**Like all Aether paradigms**, Kanon uses the universal signature:
+**Like all Aither paradigms**, Kanon uses the universal signature:
 
 ```javascript
 f(s) → sample
@@ -254,7 +254,7 @@ register('my-kanon-signal', s => {
 
 ### Composition with Helpers
 
-All Aether helpers work with Kanon signals since everything uses `f(s)`:
+All Aither helpers work with Kanon signals since everything uses `f(s)`:
 
 ```javascript
 // Compose with pipe

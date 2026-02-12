@@ -1,4 +1,4 @@
-// Aether Audio Engine (REPL-Driven)
+// Aither Audio Engine (REPL-Driven)
 
 import { startStream, config } from './speaker.js';
 import * as dsp from './dsp.js';
@@ -174,26 +174,26 @@ function generateAudioChunk() {
 
 // --- Main Execution ---
 async function start() {
-    if (globalThis.AETHER_ENGINE_INSTANCE) {
+    if (globalThis.AITHER_ENGINE_INSTANCE) {
         // If engine is already running, just reload the session
-        console.log('[Aether] Hot-reload detected. Rerunning live-session.js.');
+        console.log('[Aither] Hot-reload detected. Rerunning live-session.js.');
         await import('../live-session.js?' + Date.now()); // Cache-bust
         return;
     }
 
-    console.log('[Aether] Starting audio engine...');
+    console.log('[Aither] Starting audio engine...');
     api.clear(true); // Perform full reset on cold start
 
     startStream(generateAudioChunk);
-    globalThis.AETHER_ENGINE_INSTANCE = { status: 'running', api };
+    globalThis.AITHER_ENGINE_INSTANCE = { status: 'running', api };
 
     // --- REPL Server ---
     const REPL_PORT = 41234;
     const REPL_HOST = '127.0.0.1';
     const server = dgram.createSocket('udp4');
     server.on('listening', () => {
-        console.log(`[Aether] REPL Ready. Listening on ${REPL_HOST}:${REPL_PORT}`);
-        console.log(`[Aether] Use 'aether repl' or 'aether send <code>' to interact.`);
+        console.log(`[Aither] REPL Ready. Listening on ${REPL_HOST}:${REPL_PORT}`);
+        console.log(`[Aither] Use 'aither repl' or 'aither send <code>' to interact.`);
     });
     server.on('message', (msg) => {
         const code = msg.toString();
@@ -211,11 +211,11 @@ async function start() {
     server.bind(REPL_PORT, REPL_HOST);
 
     // Load startup script AFTER server is ready (with await to ensure API is available)
-    console.log('[Aether] Loading initial session from live-session.js...');
+    console.log('[Aither] Loading initial session from live-session.js...');
     try {
         await import('../live-session.js');
     } catch (e) {
-        console.error('[Aether] Error loading session file:', e.message);
+        console.error('[Aither] Error loading session file:', e.message);
     }
 }
 

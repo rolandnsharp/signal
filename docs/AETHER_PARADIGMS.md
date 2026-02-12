@@ -1,6 +1,6 @@
-# The Arche of Aether: The Five Paradigms
+# The Arche of Aither: The Five Paradigms
 
-This document outlines the five fundamental synthesis paradigms of the Aether engine. In ancient Greek philosophy, the **`Arche` (Ἀρχή)** was the "first principle" or fundamental substance from which all things emerge. Our five paradigms are the `Arche` of the Aether universe—the classical elements from which all sound can be composed.
+This document outlines the five fundamental synthesis paradigms of the Aither engine. In ancient Greek philosophy, the **`Arche` (Ἀρχή)** was the "first principle" or fundamental substance from which all things emerge. Our five paradigms are the `Arche` of the Aither universe—the classical elements from which all sound can be composed.
 
 **Critical Understanding**: These five paradigms are **not separate APIs**. They are **expressive styles** that emerge naturally from the single, universal interface: `f(s)`.
 
@@ -31,7 +31,7 @@ s = {
 | 2. **Rhythmos** | **Earth** 🌍 | `s.state`, `s.sr` | The Measured Form (Explicit State) |
 | 3. **Atomos** | **Air** 💨 | `s.state`, `s.dt` | The Emergent Process |
 | 4. **Physis** | **Water** 💧 | `s.state`, `s.dt` | The Physical Flow |
-| 5. **Chora** | **Aether** ✨ | `s.position`, `s.t` | The Resonant Medium |
+| 5. **Chora** | **Aither** ✨ | `s.position`, `s.t` | The Resonant Medium |
 
 ---
 
@@ -153,7 +153,7 @@ register('spring', s => {
 
 ---
 
-### 5. Chora - The Resonant Medium (Aether ✨)
+### 5. Chora - The Resonant Medium (Aither ✨)
 
 **Style**: Use `s.position` and `s.t` to create spatial wavefields. Space itself is the instrument.
 
@@ -184,7 +184,7 @@ register('propagating-wave', s => {
 
 **This is the key**: All five paradigms use the same `f(s)` interface. There are no separate APIs to learn.
 
-The ultimate goal for Aether is to allow all five styles to coexist seamlessly. A live coder can:
+The ultimate goal for Aither is to allow all five styles to coexist seamlessly. A live coder can:
 -   Create a solid foundation using **Rhythmos** (explicit state)
 -   Add an evolving, textural pad using **Atomos** (discrete emergence)
 -   Introduce a lead voice using **Physis** (physics modeling)
@@ -213,13 +213,13 @@ register('atomos-texture', s => {
 // They all run together, seamlessly
 ```
 
-By providing this complete hierarchy within a single interface, Aether becomes a powerful instrument for both musical composition and the exploration of entire sonic universes.
+By providing this complete hierarchy within a single interface, Aither becomes a powerful instrument for both musical composition and the exploration of entire sonic universes.
 
 ---
 
 ## Cross-Paradigm Interaction: The Unified Goal
 
-The true power of the Aether engine is not just in providing these five paradigms, but in allowing them to interact. The ultimate vision is to compose complex sonic systems by using simpler, more controlled models to influence more complex, organic ones.
+The true power of the Aither engine is not just in providing these five paradigms, but in allowing them to interact. The ultimate vision is to compose complex sonic systems by using simpler, more controlled models to influence more complex, organic ones.
 
 This requires a conceptual shift from traditional signal processing to physics simulation. We do not merely *modify* a signal; we apply a *force* to a virtual object or *excite* a virtual medium and listen to its natural response.
 
@@ -281,7 +281,7 @@ The five paradigms are not just alternatives; they are the fundamental elements 
 
 ### Subtractive Synthesis
 -   **Concept:** Start with a rich sound, then filter it.
--   **Aether Composition:**
+-   **Aither Composition:**
     ```javascript
     // Source: Rhythmos sawtooth (rich harmonics)
     const saw = s => {
@@ -295,7 +295,7 @@ The five paradigms are not just alternatives; they are the fundamental elements 
 
 ### Additive Synthesis
 -   **Concept:** Build a complex sound by mixing many sine waves.
--   **Aether Composition:**
+-   **Aither Composition:**
     ```javascript
     // Mix many Rhythmos sine waves at harmonic ratios
     register('additive', s => {
@@ -313,7 +313,7 @@ The five paradigms are not just alternatives; they are the fundamental elements 
 
 ### Frequency Modulation (FM) Synthesis
 -   **Concept:** Use one oscillator (Modulator) to modulate the frequency of another (Carrier).
--   **Aether Composition:**
+-   **Aither Composition:**
     ```javascript
     // Classic FM using Kanon style for modulator, Rhythmos for carrier
     register('fm', s => {

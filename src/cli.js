@@ -1,5 +1,5 @@
 #!/usr/bin/env bun
-// Aether CLI - Main entry point
+// Aither CLI - Main entry point
 
 const [, , command, ...args] = process.argv;
 
@@ -11,18 +11,18 @@ const commands = {
 
 function showHelp() {
   console.log(`
-Aether - Live Coding Audio Synthesis Engine
+Aither - Live Coding Audio Synthesis Engine
 
 Usage:
-  aether start              Start the audio server
-  aether repl               Open interactive REPL client
-  aether send <code>        Send code to running server
-  aether help               Show this help
+  aither start              Start the audio server
+  aither repl               Open interactive REPL client
+  aither send <code>        Send code to running server
+  aither help               Show this help
 
 Examples:
-  aether start              # Start the server
-  aether repl               # Connect and live code
-  aether send "play('test', s => Math.sin(s.t * 440 * Math.PI * 2))"
+  aither start              # Start the server
+  aither repl               # Connect and live code
+  aither send "play('test', s => Math.sin(s.t * 440 * Math.PI * 2))"
 `);
 }
 

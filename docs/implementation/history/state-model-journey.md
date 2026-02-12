@@ -1,6 +1,6 @@
 # State Management Journey: From Memory Leaks to Implicit Persistence
 
-This document chronicles the architectural evolution of the state management system in Aether, documenting both failures and breakthroughs. It provides crucial context for understanding why the current "Two Pool" + "Implicitly Persistent" model exists.
+This document chronicles the architectural evolution of the state management system in Aither, documenting both failures and breakthroughs. It provides crucial context for understanding why the current "Two Pool" + "Implicitly Persistent" model exists.
 
 ---
 

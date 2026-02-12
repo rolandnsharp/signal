@@ -497,9 +497,9 @@ kanon('magnetic-saturation', t => {
 
 ---
 
-## Synthesis Technique 8: Aether Waves (Standing Waves)
+## Synthesis Technique 8: Aither Waves (Standing Waves)
 
-### Tesla & Steinmetz's Aether
+### Tesla & Steinmetz's Aither
 
 Both believed EM waves propagate through an **aether** - a cosmic medium. While disproven as a physical substance, the **mathematics of standing waves** in a medium is beautiful and applicable!
 
@@ -526,7 +526,7 @@ kanon('standing-wave', t => {
 });
 ```
 
-### Resonance in the Aether
+### Resonance in the Aither
 
 ```javascript
 // Multiple standing waves creating resonance (like cavity resonators)
