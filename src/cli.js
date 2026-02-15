@@ -5,8 +5,8 @@ const [, , command, ...args] = process.argv;
 
 const commands = {
   start: './server.js',
-  repl: './repl.js',
-  send: './send-repl.js',
+  repl: './repl/client.js',
+  send: './repl/send.js',
 };
 
 function showHelp() {

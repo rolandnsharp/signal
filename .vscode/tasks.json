@@ -4,7 +4,7 @@
         {
             "label": "aither-eval-clipboard",
             "type": "shell",
-            "command": "xclip -selection clipboard -o | bun run ${workspaceFolder}/src/send-repl.js",
+            "command": "xclip -selection clipboard -o | bun run ${workspaceFolder}/src/repl/send.js",
             "presentation": {
                 "reveal": "silent",
                 "close": true
