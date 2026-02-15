@@ -107,7 +107,9 @@ const beat = phasor(130/60);
 const envelope = share(decay(beat, 40));
 const kick = sin(s => 60 + envelope(s) * 200);     
 play('kick', s => kick(s) * envelope(s) * 0.8)
-                                                                                            
+
+solo('kick', 3)
+
 // Snare on 2 and 4
 const snBeat = phasor(130/120);                                                             
 const snEnv = share(decay(s => (snBeat(s) + 0.5) % 1.0, 60));                    
@@ -127,3 +129,108 @@ stop('kick', 4)
 stop('snare', 4)
 
 stop('hats', 4)
+
+// === THINGS TO PLAY WITH ===
+
+// --- Acid bass: saw + resonant filter sweep ---
+const acidBeat = phasor(130/60);
+const acidEnv = share(decay(acidBeat, 25));
+const acidOsc = saw(s => {
+  const notes = [55, 55, 73, 55, 82, 55, 65, 55];
+  const idx = Math.floor(acidBeat(s) * 0.125) % notes.length;
+  return notes[idx];
+});
+play('acid', pipe(
+  s => acidOsc(s) * acidEnv(s) * 0.4,
+  signal => lowpass(signal, s => 200 + acidEnv(s) * 3000)
+))
+
+stop('acid', 4)
+
+// --- Ethereal pad: detuned sines with slow filter ---
+const v1 = sin(220);
+const v2 = sin(220.5);
+const v3 = sin(330);
+const v4 = sin(329.3);
+play('pad', pipe(
+  s => (v1(s) + v2(s) + v3(s) + v4(s)) * 0.1,
+  signal => lowpass(signal, s => 600 + Math.sin(s.t * 0.2) * 400)
+), 6)
+
+stop('pad', 8)
+
+// --- Metallic bell: FM with high mod depth ---
+const bellMod = sin(563);
+const bell = sin(s => 440 + bellMod(s) * 800);
+const bellBeat = phasor(2);
+const bellEnv = decay(bellBeat, 15);
+play('bell', s => bell(s) * bellEnv(s) * 0.2)
+
+stop('bell', 4)
+
+// --- Bubbles: sine with random pitch triggered fast ---
+play('bubbles', s => {
+  s.state[0] = (s.state[0] + 8 / s.sr) % 1.0;
+  const env = Math.exp(-s.state[0] * 20);
+  const freq = 300 + (Math.floor(s.t * 8) * 137.5 % 900);
+  s.state[1] = (s.state[1] + freq / s.sr) % 1.0;
+  return Math.sin(s.state[1] * 2 * Math.PI) * env * 0.15;
+})
+
+stop('bubbles', 3)
+
+// --- Haunted drone: feedback delay on a low triangle ---
+play('haunt', pipe(
+  tri(55),
+  signal => lowpass(signal, 300),
+  signal => feedback(signal, 2.0, 1.5, 0.7)
+), 4)
+
+stop('haunt', 8)
+
+// --- Stereo shimmer: detuned pair panned wide ---
+const shimL = pipe(sin(879), signal => delay(signal, 0.32, 0.13));
+const shimR = pipe(sin(880), signal => delay(signal, 0.52, 0.17));
+play('shimmer', s => [shimL(s) * 0.1, shimR(s) * 0.1], 4)
+ 
+stop('shimmer', 6) 
+
+
+// --- Glitch rhythm: pulse wave with shifting duty cycle ---
+const glitchBeat = phasor(130/60);
+const glitchEnv = decay(glitchBeat, 50);
+const glitch = pulse(s => 110 + glitchEnv(s) * 440, s => 0.05 + Math.sin(s.t * 0.7) * 0.45);
+play('glitch', pipe(
+  s => glitch(s) * glitchEnv(s) * 0.15,
+  signal => highpass(signal, 200)
+))
+
+stop('glitch', 4)
+
+//  const voices = [-10, -6, -3, 0, 3, 6, 10].map(d => saw(s => 110 + d));                      
+//   play('supersaw', pipe(                                                                    
+//     s => voices.reduce((sum, v) => sum + v(s), 0) * 0.06,                                   
+//     signal => lowpass(signal, 2000)                                                           
+//   ))   
+  
+//   stop('supersaw')
+
+
+clear() 
+
+                                                                    
+  play('logistic', s => {                                                                     
+    s.state[0] = s.state[0] || 0.5;                                                         
+    s.state[2] = (s.state[2] || 0) + 1;                                                       
+    if (s.state[2] >= 2000) {                                                               
+      s.state[2] = 0;                                                                       
+      s.state[0] = 3.59  * s.state[0] * (1 - s.state[0]);                                      
+    }                                                                                         
+    const freq = 200 + s.state[0] * 400;                                                      
+    s.state[1] = (s.state[1] + freq / s.sr) % 1.0;
+    return Math.sin(s.state[1] * 2 * Math.PI) * 0.3;
+  })
+
+
+
+stop('chaos2') 

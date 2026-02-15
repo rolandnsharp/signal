@@ -61,6 +61,7 @@ Add this to your keybindings.json
         "when": "editorTextFocus && resourceExtname == .js",
         "args": {
             "commands": [
+                "workbench.action.files.save",
                 { "command": "cursorMove", "args": { "to": "prevBlankLine", "select": false } },
                 { "command": "cursorMove", "args": { "to": "down", "by": "line", "select": false } },
                 "cursorHome",
@@ -73,7 +74,9 @@ Add this to your keybindings.json
 ]
 ```
 
-**Alt+Enter** — select the current paragraph and send it to Aither.
+**Alt+Enter** — save the file, select the current paragraph, and send it to Aither.
+The save-first ensures the file is written to disk before the snippet is sent,
+so you can edit and send in a single keystroke.
 
 ### 3. Config File Locations
 
