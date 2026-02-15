@@ -141,6 +141,31 @@ export const api = {
         };
     },
 
+    mute: (name, fadeTime) => {
+        const entry = REGISTRY.get(name);
+        if (!entry || entry.muted) return;
+        entry.muted = true;
+        entry.muteGain = fadeTime ? 1 : 0;
+        entry.muteFadeRate = fadeTime ? -1 / (fadeTime * config.SAMPLE_RATE) : 0;
+    },
+    unmute: (name, fadeTime) => {
+        const entry = REGISTRY.get(name);
+        if (!entry || !entry.muted) return;
+        entry.muted = false;
+        entry.muteGain = fadeTime ? 0 : 1;
+        entry.muteFadeRate = fadeTime ? 1 / (fadeTime * config.SAMPLE_RATE) : 0;
+    },
+
+    list: () => {
+        const names = [...REGISTRY.keys()];
+        const status = names.map(n => {
+            const entry = REGISTRY.get(n);
+            return entry.muted ? `${n} (muted)` : n;
+        });
+        console.log(`[Aither] Playing: ${status.join(', ') || '(none)'}`);
+        return names;
+    },
+
     solo: (name, fadeTime) => {
         for (const key of REGISTRY.keys()) {
             if (key !== name) api.stop(key, fadeTime);
@@ -183,17 +208,24 @@ export function generateAudioChunk() {
         s.t = time_sec + time_frac;
         s.idx = i;
 
-        for (const [name, { fn, stateObject }] of REGISTRY.entries()) {
-            s.state = stateObject;
+        for (const [name, entry] of REGISTRY.entries()) {
+            s.state = entry.stateObject;
             s.name = name;
             try {
-                const result = fn(s);
+                const result = entry.fn(s);
+                let gain = 1;
+                if (entry.muteFadeRate) {
+                    entry.muteGain += entry.muteFadeRate;
+                    if (entry.muteGain <= 0) { entry.muteGain = 0; entry.muteFadeRate = 0; }
+                    if (entry.muteGain >= 1) { entry.muteGain = 1; entry.muteFadeRate = 0; }
+                    gain = entry.muteGain;
+                } else if (entry.muted) { continue; }
                 if (Array.isArray(result)) {
-                    left += result[0] || 0;
-                    right += result[1] || 0;
+                    left += (result[0] || 0) * gain;
+                    right += (result[1] || 0) * gain;
                 } else {
-                    left += result || 0;
-                    right += result || 0;
+                    left += (result || 0) * gain;
+                    right += (result || 0) * gain;
                 }
             } catch (e) {
                 console.error(`[Aither] Signal "${name}" threw: ${e.message}. Removing.`);

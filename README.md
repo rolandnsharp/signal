@@ -63,8 +63,13 @@ play('name', fn)        // Start a signal
 play('name', fn, 4)     // Start with 4-second fade-in
 stop('name')            // Stop immediately
 stop('name', 4)         // Stop with 4-second fade-out
+mute('name')            // Silence a signal (state keeps running)
+mute('name', 4)         // Fade to silence over 4 seconds
+unmute('name')          // Resume audio output
+unmute('name', 4)       // Fade back in over 4 seconds
 solo('name')            // Stop everything except this signal
 solo('name', 4)         // Fade out everything else over 4 seconds
+list()                  // Print all playing signals
 clear()                 // Remove all signals and reset state
 clear(4)                // Fade out all signals over 4 seconds
 ```
