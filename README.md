@@ -265,6 +265,8 @@ There's no graph, no scheduler, no distinction between "control rate" and "audio
 
 Traditional environments (SuperCollider, Max/MSP, PureData) use dataflow graphs. Aither uses plain function composition. The JIT compiles your entire signal chain into a single tight loop. No message passing, no scheduling overhead, no garbage collection on the hot path.
 
+The tradeoff: everything runs at audio rate. A step sequencer that only changes notes twice per second still gets evaluated 48,000 times per second. This is deliberate — it means any signal can modulate any parameter without special plumbing. The CPU cost of redundant table lookups and modulos is negligible. If a complex patch ever hits CPU limits, a `hold(signal, rate)` primitive that decimates to a lower update rate would solve it without breaking the model.
+
 ## License
 
 MIT
