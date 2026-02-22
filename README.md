@@ -23,10 +23,8 @@ play('hats', s => hiss(s) * decay(phasor(130/30), 80)(s) * 0.3)
 
 // Acid bass — saw wave with filter sweep
 const bpm = 130/60
-const acidBeat = phasor(bpm)
-const acidEnv = share(decay(acidBeat, 25))
-const notes = [55, 55, 73, 55, 82, 55, 65, 55]
-const acidOsc = saw(s => notes[Math.floor(s.t * bpm) % notes.length])
+const acidEnv = share(decay(phasor(bpm), 25))
+const acidOsc = saw(wave(bpm, [55, 55, 73, 55, 82, 55, 65, 55]))
 play('acid', pipe(
   s => acidOsc(s) * acidEnv(s) * 0.4,
   signal => lowpass(signal, s => 200 + acidEnv(s) * 3000)
@@ -116,6 +114,7 @@ tri(220)                        // Triangle
 square(440)                     // Square wave
 pulse(440, 0.25)                // Pulse with 25% duty cycle
 phasor(2)                       // 0-to-1 ramp at 2 Hz
+wave(440, [0, 0.5, 1, -0.5])   // Wavetable oscillator
 noise()                         // White noise
 
 // All accept modulation functions
@@ -133,6 +132,7 @@ delay(signal, 0.5, 0.25)                 // Delay: max 0.5s, tap at 0.25s
 feedback(signal, 2.0, 0.375, 0.6)        // Feedback delay
 reverb(signal, 2.0, 0.4, 0.3)            // Reverb: 2s RT60, damping, 30% wet
 tremolo(signal, 6, 0.4)                  // Tremolo: 6 Hz, 40% depth
+slew(signal, 0.1)                        // Smooth over 100ms (portamento)
 
 // Cutoff can be modulated
 lowpass(signal, s => 200 + env(s) * 3000)
@@ -143,6 +143,7 @@ lowpass(signal, s => 200 + env(s) * 3000)
 ```javascript
 gain(signal, 0.5)         // Scale amplitude
 pan(signal, -0.3)         // Stereo placement (-1 left, +1 right)
+fold(signal, 3)           // Wavefold — drive past [-1,1] and reflect back
 decay(phasor, 40)         // Exponential decay envelope
 share(signal)             // Cache a signal so it's only computed once per sample
 ```
@@ -211,6 +212,31 @@ play('haunt', pipe(
 ))
 ```
 
+### Sequenced arpeggio
+
+`wave` at beat rate is a sequencer. At audio rate it's a custom waveform. Same oscillator.
+
+```javascript
+const bpm = 130/60
+const notes = wave(bpm * 2, [220, 330, 440, 330])
+const env = decay(phasor(bpm * 2), 30)
+play('arp', pipe(
+  sin(notes),
+  signal => gain(signal, env),
+  signal => feedback(signal, 1.0, 0.375, 0.4)
+))
+```
+
+### Wavefolded bass
+
+```javascript
+play('nasty', pipe(
+  saw(55),
+  signal => fold(signal, s => 2 + sin(0.5)(s) * 1.5),
+  signal => lowpass(signal, 800)
+))
+```
+
 ### Raw state — logistic map oscillator
 
 No DSP helpers needed. Just math and `s.state`.
@@ -231,7 +257,7 @@ play('chaos', s => {
 
 ## The idea
 
-There's no graph, no scheduler, no distinction between "control rate" and "audio rate." A clock is a phasor. An envelope is `decay(phasor, rate)`. A sequencer is `notes[Math.floor(phasor(s) * n)]`. Rhythm, melody, timbre — they're all the same thing: functions of `s` composed together.
+There's no graph, no scheduler, no distinction between "control rate" and "audio rate." A clock is a phasor. An envelope is `decay(phasor, rate)`. A sequencer is `wave(bpm, notes)` — the same wavetable oscillator that produces custom waveforms at audio rate. Rhythm, melody, timbre — they're all the same thing: functions of `s` composed together.
 
 Traditional environments (SuperCollider, Max/MSP, PureData) use dataflow graphs. Aither uses plain function composition. The JIT compiles your entire signal chain into a single tight loop. No message passing, no scheduling overhead, no garbage collection on the hot path.
 

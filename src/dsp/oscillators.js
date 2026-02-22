@@ -81,5 +81,24 @@ export const phasor = (freq) => {
     };
 };
 
+// --- Wavetable ---
+// A waveform defined by an array of values. Phase accumulator scans
+// the table at the given frequency. Works as an oscillator (audio-rate
+// custom waveform) or as a sequencer (control-rate step pattern).
+//
+//   wave(440, [0, 0.5, 1, 0.5, 0, -0.5, -1, -0.5])  // custom shape
+//   wave(bpm, [55, 73, 82, 65])                        // note sequence
+//   saw(wave(bpm, [55, 73, 82, 65]))                   // sequenced saw
+export const wave = (freq, values) => {
+    const idx = nextHelperIndex();
+    const len = values.length;
+    return s => {
+        const addr = claimStateBlock(s, 'wave', idx, 1);
+        const f = typeof freq === 'function' ? freq(s) : freq;
+        mem[addr] = (mem[addr] + f / s.sr) % 1.0;
+        return values[Math.floor(mem[addr] * len) % len];
+    };
+};
+
 // --- White Noise (stateless) ---
 export const noise = () => _s => Math.random() * 2 - 1;

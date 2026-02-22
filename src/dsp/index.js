@@ -2,6 +2,6 @@
 
 export { resetHelperCounterInternal } from './state.js';
 export { pipe, mix } from './compose.js';
-export { tremolo, lowpass, highpass, delay, feedback, reverb } from './effects.js';
-export { share, gain, decay, pan } from './helpers.js';
-export { sin, saw, tri, square, pulse, phasor, noise } from './oscillators.js';
+export { tremolo, lowpass, highpass, delay, feedback, reverb, slew } from './effects.js';
+export { share, gain, decay, pan, fold } from './helpers.js';
+export { sin, saw, tri, square, pulse, phasor, wave, noise } from './oscillators.js';

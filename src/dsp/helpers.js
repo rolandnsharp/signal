@@ -56,3 +56,26 @@ export const pan = (signal, position) => {
         ];
     };
 };
+
+// --- Wavefold ---
+// Folds a signal back on itself when driven past [-1, 1].
+// amount = 1 is passthrough. Higher values add harmonics.
+// Stateless, closed-form (no loops).
+function foldSample(x, amount) {
+    x *= amount;
+    x = ((x % 4) + 4) % 4;
+    return x < 2 ? x - 1 : 3 - x;
+}
+
+export const fold = (signal, amount) => {
+    const amtFn = typeof amount === 'function' ? amount : () => amount;
+    return s => {
+        const value = signal(s);
+        const a = amtFn(s);
+        if (Array.isArray(value)) {
+            for (let i = 0; i < value.length; i++) value[i] = foldSample(value[i], a);
+            return value;
+        }
+        return foldSample(value, a);
+    };
+};

@@ -152,3 +152,16 @@ const reverb_mono = (s, input, mem, addr, _chan, time, damping, mix) => {
     return input * (1 - mixVal) + wet * mixVal;
 };
 export const reverb = expand(reverb_mono, 'reverb', REVERB_SLOTS);
+
+// --- Slew ---
+// Smooths a signal over time. Time is in seconds — how long to
+// converge to a new value. At time=0, no smoothing (passthrough).
+const slew_mono = (s, input, mem, addr, _chan, time) => {
+    const t = typeof time === 'function' ? time(s) : time;
+    const alpha = t > 0 ? Math.min(1, s.dt / t) : 1;
+    const prev = mem[addr];
+    const output = prev + (input - prev) * alpha;
+    mem[addr] = output;
+    return output;
+};
+export const slew = expand(slew_mono, 'slew', 1);

@@ -41,19 +41,9 @@ phasor at 2 Hz (120 BPM):
   0    0.5   1.0   1.5   2.0 sec
 ```
 
-> **Note:** `phasor(freq)` is planned but not yet implemented as a helper.
-> For now, use the phase directly inside your signal function with `s.state`:
-
 ```javascript
-play('click', s => {
-  // Manual phasor: advance phase, wrap at 1.0
-  const bps = 130 / 60;
-  s.state[0] = (s.state[0] + bps / s.sr) % 1.0;
-  const phase = s.state[0];
-
-  // A click at the start of each beat
-  return phase < 0.002 ? 0.8 : 0;
-})
+// A click at the start of each beat
+play('click', s => phasor(130/60)(s) < 0.002 ? 0.8 : 0)
 ```
 
 ---
@@ -65,33 +55,31 @@ Everything is derived from the phasor value with simple math:
 ### Gate (on/off pulse)
 
 ```javascript
-// Gate: 1 for first 10% of beat, 0 otherwise
-const gate = phase < 0.1 ? 1 : 0;
+const gate = pulse(130/60, 0.1)   // 1 for first 10% of beat, 0 otherwise
 ```
 
 ### Envelope (percussive decay)
 
 ```javascript
-// Fast exponential decay from the start of each beat
-const env = Math.exp(-phase * 30);
+const env = decay(phasor(130/60), 30)   // fast exponential decay each beat
 ```
 
-### Sequence (step through values)
+### Sequence (wavetable)
+
+A sequence is a waveform. `wave` is a wavetable oscillator — its phase
+scans an array of values at a given frequency, just like `sin` scans a
+sine curve:
 
 ```javascript
-// Select from array based on position in cycle
-const notes = [60, 63, 67, 70];
-const note = notes[Math.floor(phase * notes.length)];
+const notes = wave(130/60, [60, 63, 67, 70])   // cycle through notes at beat rate
+play('melody', sin(notes))
 ```
 
 ### Clock Division
 
 ```javascript
-// Half-speed phasor (every 2 beats)
-const halfPhase = (s.state[1] + (bps / 2) / s.sr) % 1.0;
-
-// Double-speed phasor (eighth notes)
-const doublePhase = (s.state[2] + (bps * 2) / s.sr) % 1.0;
+const half = phasor(130/60 / 2)     // half notes
+const eighth = phasor(130/60 * 2)   // eighth notes
 ```
 
 ---
@@ -239,44 +227,54 @@ envelope's sense of time**.
 
 ---
 
-## Planned Rhythm Helpers
+## Sequencing Is Oscillation
 
-> These helpers don't exist yet. They represent the vocabulary we're
-> building toward. For now, use `s.state` and math as shown above.
+You might expect a `seq(clock, [values])` helper — a sequencer that
+steps through a list. But sequencing in Aither isn't a special concept.
+It's just what happens when a wavetable oscillator runs at a low frequency.
+
+`wave(freq, values)` is a wavetable oscillator. Its phase accumulator
+scans an array at the given frequency, exactly like `sin` scans a sine
+curve. At audio rate, it produces a custom waveform. At beat rate, it
+produces a step sequence. Same mechanism, different timescale.
 
 ```javascript
-// phasor(freq) — 0→1 ramp, the fundamental rhythm primitive
-const beat = phasor(s => 130/60);
+const bpm = 130/60
 
-// gate(freq, duty) — 0/1 pulse derived from phasor
-const onOff = gate(s => 130/60, 0.1);
+// A note sequence — wave scans the array at beat rate
+play('acid', saw(wave(bpm, [55, 73, 82, 65])))
 
-// decay(signal, rate) — exponential decay triggered by rising edges
-const env = decay(beat, 40);
+// A velocity pattern — wave as amplitude modulation
+const vel = wave(bpm * 2, [1, 0.6, 0.8, 0.5, 1, 0.4, 0.9, 0.7])
+play('hit', s => sin(440)(s) * decay(phasor(bpm * 2), 40)(s) * vel(s))
 
-// seq(phasor, [...values]) — step through array values by phase position
-const note = seq(beat, [60, 63, 67, 70]);
+// A filter cutoff pattern
+const cutoffs = wave(bpm, [400, 1200, 600, 2000])
+play('sweep', pipe(saw(110), signal => lowpass(signal, cutoffs)))
 
-// euclidean(hits, steps, phasor) — euclidean rhythm pattern
-const pattern = euclidean(3, 8, beat);
+// Audio-rate wavetable — custom waveform at 440 Hz
+play('custom', wave(440, [0, 0.5, 1, 0.5, 0, -0.3, -1, -0.7]))
 ```
 
-These are the building blocks of a rhythm language. Each is still a signal
-— `f(s) → sample` — composable with everything else.
+There is no sequencer. There are oscillators, and some of them read
+from tables instead of computing math. The distinction between "sequence"
+and "waveform" is just frequency.
 
 ---
 
 ## Summary
 
-1. **Start with a phasor**: `s.state[n] = (s.state[n] + freq/s.sr) % 1.0`
+1. **Start with a phasor**: the 0→1 ramp is the fundamental rhythm primitive
 2. **Derive everything from phase**: gates, envelopes, sequences are just
-   math on the 0→1 ramp
+   math on the ramp
 3. **Clock division is frequency division**: halve the frequency for half
    notes, double for eighth notes
 4. **Use Pattern 1** (oscillator helpers) for sustained sounds
 5. **Use Pattern 2** (inline with s.state) for percussive sounds where
    everything is interdependent
 6. **Warp time for groove**: modulate the phase itself for swing and feel
+7. **Sequencing is oscillation**: `wave` at beat rate is a sequencer,
+   at audio rate is a custom waveform — same mechanism, different timescale
 
 In Aither, you don't program a drum pattern. You program the physics of a
 drum being struck by a clock made of light.
