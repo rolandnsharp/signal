@@ -153,6 +153,66 @@ const reverb_mono = (s, input, mem, addr, _chan, time, damping, mix) => {
 };
 export const reverb = expand(reverb_mono, 'reverb', REVERB_SLOTS);
 
+// --- SVF (State Variable Filter — trapezoidal integration) ---
+// Shared SVF computation — returns lp, hp, bp, notch + updated integrator states.
+function svfTick(v0, s1, s2, cutoff, res, sr) {
+    const g = Math.tan(Math.PI * Math.min(cutoff, sr * 0.49) / sr);
+    const k = 2 * (1 - res);   // res 0→1, k 2→0, self-oscillation at res=1
+
+    const a1 = 1 / (1 + g * (g + k));
+    const a2 = g * a1;
+    const a3 = g * a2;
+
+    const v3 = v0 - s2;
+    const v1 = a1 * s1 + a2 * v3;
+    const v2 = s2 + a2 * s1 + a3 * v3;
+
+    const new_s1 = 2 * v1 - s1;
+    const new_s2 = 2 * v2 - s2;
+
+    return { lp: v2, bp: v1, hp: v0 - k * v1 - v2, notch: v0 - k * v1, s1: new_s1, s2: new_s2 };
+}
+
+const lpf_mono = (s, input, mem, addr, _chan, cutoff, resonance) => {
+    const fc = typeof cutoff === 'function' ? cutoff(s) : cutoff;
+    const res = typeof resonance === 'function' ? resonance(s) : resonance;
+    const result = svfTick(input, mem[addr], mem[addr + 1], fc, res, s.sr);
+    mem[addr] = result.s1;
+    mem[addr + 1] = result.s2;
+    return result.lp;
+};
+export const lpf = expand(lpf_mono, 'lpf', 2);
+
+const hpf_mono = (s, input, mem, addr, _chan, cutoff, resonance) => {
+    const fc = typeof cutoff === 'function' ? cutoff(s) : cutoff;
+    const res = typeof resonance === 'function' ? resonance(s) : resonance;
+    const result = svfTick(input, mem[addr], mem[addr + 1], fc, res, s.sr);
+    mem[addr] = result.s1;
+    mem[addr + 1] = result.s2;
+    return result.hp;
+};
+export const hpf = expand(hpf_mono, 'hpf', 2);
+
+const bpf_mono = (s, input, mem, addr, _chan, cutoff, resonance) => {
+    const fc = typeof cutoff === 'function' ? cutoff(s) : cutoff;
+    const res = typeof resonance === 'function' ? resonance(s) : resonance;
+    const result = svfTick(input, mem[addr], mem[addr + 1], fc, res, s.sr);
+    mem[addr] = result.s1;
+    mem[addr + 1] = result.s2;
+    return result.bp;
+};
+export const bpf = expand(bpf_mono, 'bpf', 2);
+
+const notch_mono = (s, input, mem, addr, _chan, cutoff, resonance) => {
+    const fc = typeof cutoff === 'function' ? cutoff(s) : cutoff;
+    const res = typeof resonance === 'function' ? resonance(s) : resonance;
+    const result = svfTick(input, mem[addr], mem[addr + 1], fc, res, s.sr);
+    mem[addr] = result.s1;
+    mem[addr + 1] = result.s2;
+    return result.notch;
+};
+export const notch = expand(notch_mono, 'notch', 2);
+
 // --- Slew ---
 // Smooths a signal over time. Time is in seconds — how long to
 // converge to a new value. At time=0, no smoothing (passthrough).

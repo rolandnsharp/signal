@@ -21,13 +21,13 @@ play('kick', s => kick(s) * envelope(s) * 0.8)
 const hiss = pipe(noise(), signal => highpass(signal, 6000))
 play('hats', s => hiss(s) * decay(phasor(130/30), 80)(s) * 0.3)
 
-// Acid bass — saw wave with filter sweep
+// Acid bass — saw wave with resonant filter sweep
 const bpm = 130/60
 const acidEnv = share(decay(phasor(bpm), 25))
 const acidOsc = saw(wave(bpm, [55, 55, 73, 55, 82, 55, 65, 55]))
 play('acid', pipe(
   s => acidOsc(s) * acidEnv(s) * 0.4,
-  signal => lowpass(signal, s => 200 + acidEnv(s) * 3000)
+  signal => lpf(signal, s => 200 + acidEnv(s) * 3000, 0.8)
 ))
 ```
 
@@ -126,16 +126,20 @@ sin(s => 440 + sin(6)(s) * 50)  // Vibrato
 Effects wrap a signal and process it. They handle stereo automatically.
 
 ```javascript
-lowpass(signal, 800)                      // One-pole lowpass at 800 Hz
-highpass(signal, 200)                     // Highpass
+lpf(signal, 800, 0.5)                    // Resonant lowpass (SVF) — cutoff, resonance 0–1
+hpf(signal, 200, 0.3)                    // Resonant highpass
+bpf(signal, 800, 0.9)                    // Bandpass
+notch(signal, 400, 0.7)                  // Notch (band-reject)
+lowpass(signal, 800)                      // One-pole lowpass (no resonance — cheap, good for smoothing)
+highpass(signal, 200)                     // One-pole highpass
 delay(signal, 0.5, 0.25)                 // Delay: max 0.5s, tap at 0.25s
 feedback(signal, 2.0, 0.375, 0.6)        // Feedback delay
 reverb(signal, 2.0, 0.4, 0.3)            // Reverb: 2s RT60, damping, 30% wet
 tremolo(signal, 6, 0.4)                  // Tremolo: 6 Hz, 40% depth
 slew(signal, 0.1)                        // Smooth over 100ms (portamento)
 
-// Cutoff can be modulated
-lowpass(signal, s => 200 + env(s) * 3000)
+// Cutoff and resonance can be modulated
+lpf(signal, s => 200 + env(s) * 3000, 0.8)
 ```
 
 ### Helpers
