@@ -84,7 +84,7 @@ editor.addEventListener('scroll', syncScroll);
 const snippetBar = document.getElementById('snippet-bar');
 
 async function loadSnippet(name) {
-  const res = await fetch(`/web/snippets/${name}.js`);
+  const res = await fetch(`./web/snippets/${name}.js`);
   editor.value = await res.text();
   highlight();
   for (const btn of snippetBar.children) {
@@ -93,7 +93,7 @@ async function loadSnippet(name) {
 }
 
 async function initSnippets() {
-  const names = await (await fetch('/api/snippets')).json();
+  const names = await (await fetch('./web/snippets/index.json')).json();
   for (const name of names) {
     const btn = document.createElement('button');
     btn.textContent = name;
