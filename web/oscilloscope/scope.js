@@ -9,32 +9,12 @@ function draw() {
   const w = canvas.width / devicePixelRatio;
   const h = canvas.height / devicePixelRatio;
 
-  // Phosphor persistence fade
+  // Phosphor persistence fade — dark green, not black
   ctx.save();
   ctx.setTransform(1, 0, 0, 1, 0, 0);
-  ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
+  ctx.fillStyle = 'rgba(0, 6, 0, 0.18)';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
   ctx.restore();
-
-  // Graticule
-  ctx.strokeStyle = 'rgba(0, 255, 0, 0.08)';
-  ctx.lineWidth = 0.5;
-  ctx.beginPath();
-  for (let i = 1; i < 10; i++) {
-    const x = (w / 10) * i;
-    ctx.moveTo(x, 0); ctx.lineTo(x, h);
-  }
-  for (let i = 1; i < 8; i++) {
-    const y = (h / 8) * i;
-    ctx.moveTo(0, y); ctx.lineTo(w, y);
-  }
-  ctx.stroke();
-  // Center cross brighter
-  ctx.strokeStyle = 'rgba(0, 255, 0, 0.2)';
-  ctx.beginPath();
-  ctx.moveTo(w / 2, 0); ctx.lineTo(w / 2, h);
-  ctx.moveTo(0, h / 2); ctx.lineTo(w, h / 2);
-  ctx.stroke();
 
   // Fetch data
   analyserL.getFloatTimeDomainData(bufferL);
@@ -57,17 +37,43 @@ function draw() {
     else ctx.lineTo(x, y);
   }
 
-  // Pass 1: outer glow
-  ctx.strokeStyle = '#33ff33';
-  ctx.lineWidth = 1.5;
-  ctx.shadowColor = '#33ff33';
-  ctx.shadowBlur = 8;
-  ctx.stroke();
+  // Phosphor bloom — multiple passes, fat and fuzzy
+  const passes = [
+    { color: 'rgba(0, 80, 0, 0.04)',  width: 40, blur: 100 },
+    { color: 'rgba(0, 120, 0, 0.06)', width: 24, blur: 60  },
+    { color: 'rgba(0, 180, 0, 0.1)',  width: 14, blur: 35  },
+    { color: 'rgba(0, 255, 0, 0.3)',  width: 6,  blur: 15  },
+    { color: 'rgba(200,255,200,0.7)', width: 3,  blur: 4   },
+    { color: '#ffffff',               width: 1,  blur: 0   },
+  ];
+  for (const p of passes) {
+    ctx.strokeStyle = p.color;
+    ctx.lineWidth = p.width;
+    ctx.shadowColor = '#00ff00';
+    ctx.shadowBlur = p.blur;
+    ctx.stroke();
+  }
 
-  // Pass 2: bright beam center
+  // Graticule — dark lines drawn ON TOP of glow so they only
+  // appear as cuts where the phosphor beam passes over them
   ctx.shadowBlur = 0;
-  ctx.strokeStyle = '#aaffaa';
+  ctx.strokeStyle = 'rgba(0, 3, 0, 0.55)';
   ctx.lineWidth = 0.5;
+  ctx.beginPath();
+  for (let i = 1; i < 10; i++) {
+    const x = (w / 10) * i;
+    ctx.moveTo(x, 0); ctx.lineTo(x, h);
+  }
+  for (let i = 1; i < 8; i++) {
+    const y = (h / 8) * i;
+    ctx.moveTo(0, y); ctx.lineTo(w, y);
+  }
+  ctx.stroke();
+  // Center cross slightly more visible
+  ctx.strokeStyle = 'rgba(0, 3, 0, 0.7)';
+  ctx.beginPath();
+  ctx.moveTo(w / 2, 0); ctx.lineTo(w / 2, h);
+  ctx.moveTo(0, h / 2); ctx.lineTo(w, h / 2);
   ctx.stroke();
 }
 

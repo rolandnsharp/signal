@@ -193,4 +193,35 @@ editor.addEventListener('keydown', (e) => {
     }
 });
 
+// Scroll-to-scrub: mouse wheel increments/decrements selected numbers
+editor.addEventListener('wheel', (e) => {
+    const { selectionStart, selectionEnd } = editor;
+    if (selectionStart === selectionEnd) return;
+
+    const selected = editor.value.substring(selectionStart, selectionEnd);
+    if (!/^-?\d+\.?\d*$/.test(selected)) return;
+
+    e.preventDefault();
+
+    const dotIndex = selected.indexOf('.');
+    let step, decimals;
+    if (dotIndex === -1) {
+        step = 1;
+        decimals = 0;
+    } else {
+        decimals = selected.length - dotIndex - 1;
+        step = Math.pow(10, -decimals);
+    }
+
+    const current = parseFloat(selected);
+    const delta = e.deltaY < 0 ? step : -step;
+    const newValue = (current + delta).toFixed(decimals);
+
+    editor.value = editor.value.substring(0, selectionStart) + newValue + editor.value.substring(selectionEnd);
+    editor.selectionStart = selectionStart;
+    editor.selectionEnd = selectionStart + newValue.length;
+    highlight();
+    sendCode();
+});
+
 log('Ready. Click "Send it!" or Ctrl+Enter to evaluate.');
