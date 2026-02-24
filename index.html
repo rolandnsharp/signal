@@ -30,7 +30,7 @@ header h1 {
     color: #a0a0a0;
     letter-spacing: 0.1em;
 }
-#start-btn {
+.header-btn {
     background: #1a1a2e;
     color: #7c8aff;
     border: 1px solid #2a2a4e;
@@ -40,8 +40,12 @@ header h1 {
     cursor: pointer;
     border-radius: 4px;
 }
-#start-btn:hover:not(:disabled) { background: #22224a; }
-#start-btn:disabled { opacity: 0.5; cursor: default; }
+.header-btn:hover { background: #22224a; }
+#stop-btn {
+    color: #ff6b6b;
+    border-color: #4e2a2a;
+}
+#stop-btn:hover { background: #3a1a1a; }
 .hint {
     color: #555;
     font-size: 12px;
@@ -69,6 +73,28 @@ main {
     letter-spacing: 0.08em;
     flex-shrink: 0;
 }
+#snippet-bar {
+    display: flex;
+    gap: 4px;
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+#snippet-bar::-webkit-scrollbar { display: none; }
+#snippet-bar button {
+    background: transparent;
+    color: #555;
+    border: none;
+    padding: 2px 8px;
+    font-family: inherit;
+    font-size: 11px;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+    border-radius: 2px;
+}
+#snippet-bar button:hover { color: #999; }
+#snippet-bar button.active { color: #7c8aff; }
 .editor-wrap {
     flex: 1;
     position: relative;
@@ -142,25 +168,17 @@ main {
 <body>
 <header>
     <h1>AITHER</h1>
-    <button id="start-btn">Play</button>
+    <button id="send-btn" class="header-btn">Send it!</button>
+    <button id="stop-btn" class="header-btn">Stop</button>
     <span id="signals"></span>
-    <span class="hint">Ctrl+Enter to evaluate</span>
+    <span class="hint">Ctrl+Enter to send</span>
 </header>
 <main>
     <div id="editor-pane">
-        <div class="pane-label">Editor</div>
+        <div class="pane-label" id="snippet-bar"></div>
         <div class="editor-wrap">
             <pre id="highlight" aria-hidden="true"></pre>
-            <textarea id="editor" spellcheck="false" autocomplete="off">// Vortex — spiraling stereo feedback
-const phi = 1.618
-const vort = sin(s => 162 * phi + Math.sin(s.t * 0.3) * 80)
-play('vortex', pipe(
-  s => vort(s) * 0.1,
-  signal => feedback(signal, 1.5, s => 0.3 + Math.sin(s.t * phi * 0.4) * 0.2, 0.7),
-  signal => highpass(signal, 30),
-  signal => pan(signal, s => Math.sin(s.t * phi * 0.6))
-))
-</textarea>
+            <textarea id="editor" spellcheck="false" autocomplete="off"></textarea>
         </div>
     </div>
     <div id="console-pane">

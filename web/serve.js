@@ -1,5 +1,8 @@
 // Aither Web — minimal static file server.
 
+import { readdir } from 'node:fs/promises';
+import { join } from 'node:path';
+
 const MIME = {
     '.html': 'text/html',
     '.js': 'application/javascript',
@@ -9,11 +12,23 @@ const MIME = {
 };
 
 const port = parseInt(process.env.PORT) || 3000;
+const snippetsDir = join(import.meta.dir, 'snippets');
 
 Bun.serve({
     port,
     async fetch(req) {
         const url = new URL(req.url);
+
+        // API: list snippet names
+        if (url.pathname === '/api/snippets') {
+            const files = await readdir(snippetsDir);
+            const names = files
+                .filter(f => f.endsWith('.js'))
+                .map(f => f.slice(0, -3))
+                .sort();
+            return Response.json(names);
+        }
+
         const pathname = url.pathname === '/' ? '/index.html' : url.pathname;
         const file = Bun.file('.' + pathname);
         if (!(await file.exists())) return new Response('Not found', { status: 404 });

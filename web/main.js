@@ -6,7 +6,8 @@ let workletNode = null;
 const editor = document.getElementById('editor');
 const highlightEl = document.getElementById('highlight');
 const output = document.getElementById('output');
-const startBtn = document.getElementById('start-btn');
+const sendBtn = document.getElementById('send-btn');
+const stopBtn = document.getElementById('stop-btn');
 const signals = document.getElementById('signals');
 
 // --- Syntax highlighting ---
@@ -77,6 +78,34 @@ function syncScroll() {
 
 editor.addEventListener('input', highlight);
 editor.addEventListener('scroll', syncScroll);
+
+// --- Snippet bar ---
+
+const snippetBar = document.getElementById('snippet-bar');
+
+async function loadSnippet(name) {
+  const res = await fetch(`/web/snippets/${name}.js`);
+  editor.value = await res.text();
+  highlight();
+  for (const btn of snippetBar.children) {
+    btn.classList.toggle('active', btn.dataset.name === name);
+  }
+}
+
+async function initSnippets() {
+  const names = await (await fetch('/api/snippets')).json();
+  for (const name of names) {
+    const btn = document.createElement('button');
+    btn.textContent = name;
+    btn.dataset.name = name;
+    btn.addEventListener('click', () => loadSnippet(name));
+    snippetBar.appendChild(btn);
+  }
+  if (names.includes('vortex')) loadSnippet('vortex');
+  else if (names.length) loadSnippet(names[0]);
+}
+
+initSnippets();
 highlight();
 
 function log(text, cls) {
@@ -86,8 +115,6 @@ function log(text, cls) {
     output.appendChild(line);
     output.scrollTop = output.scrollHeight;
 }
-
-let playing = false;
 
 async function ensureAudio() {
     if (audioCtx) return;
@@ -110,11 +137,8 @@ async function ensureAudio() {
     log('Audio started (' + audioCtx.sampleRate + ' Hz)');
 }
 
-function sendCode() {
-    if (!workletNode) {
-        log('Click "Play" first.', 'error');
-        return;
-    }
+async function sendCode() {
+    await ensureAudio();
     const code = editor.value.trim();
     if (!code) return;
     log('> ' + (code.length > 80 ? code.slice(0, 80) + '...' : code), 'cmd');
@@ -126,21 +150,14 @@ function sendCode() {
     workletNode.port.postMessage({ type: 'eval', code });
 }
 
-async function togglePlay() {
-    if (!playing) {
-        await ensureAudio();
-        sendCode();
-        startBtn.textContent = 'Stop';
-        playing = true;
-    } else {
-        workletNode.port.postMessage({ type: 'eval', code: 'clear(0.5)' });
-        log('Stopping with 0.5s fadeout...');
-        startBtn.textContent = 'Play';
-        playing = false;
-    }
+function stopAll() {
+    if (!workletNode) return;
+    workletNode.port.postMessage({ type: 'eval', code: 'clear(0.5)' });
+    log('Stopping with 0.5s fadeout...');
 }
 
-startBtn.addEventListener('click', togglePlay);
+sendBtn.addEventListener('click', () => sendCode());
+stopBtn.addEventListener('click', stopAll);
 
 editor.addEventListener('keydown', (e) => {
     // Ctrl/Cmd + Enter to evaluate
@@ -160,4 +177,4 @@ editor.addEventListener('keydown', (e) => {
     }
 });
 
-log('Ready. Click "Play" to start, Ctrl+Enter to evaluate.');
+log('Ready. Click "Send it!" or Ctrl+Enter to evaluate.');
