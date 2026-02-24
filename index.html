@@ -142,7 +142,7 @@ main {
 <body>
 <header>
     <h1>AITHER</h1>
-    <button id="start-btn">Start Audio</button>
+    <button id="start-btn">Play</button>
     <span id="signals"></span>
     <span class="hint">Ctrl+Enter to evaluate</span>
 </header>
@@ -151,10 +151,15 @@ main {
         <div class="pane-label">Editor</div>
         <div class="editor-wrap">
             <pre id="highlight" aria-hidden="true"></pre>
-            <textarea id="editor" spellcheck="false" autocomplete="off">// Every sound is a function: f(s) => sample
-// Press Ctrl+Enter to evaluate
-
-play('hello', sin(440))
+            <textarea id="editor" spellcheck="false" autocomplete="off">// Vortex — spiraling stereo feedback
+const phi = 1.618
+const vort = sin(s => 162 * phi + Math.sin(s.t * 0.3) * 80)
+play('vortex', pipe(
+  s => vort(s) * 0.1,
+  signal => feedback(signal, 1.5, s => 0.3 + Math.sin(s.t * phi * 0.4) * 0.2, 0.7),
+  signal => highpass(signal, 30),
+  signal => pan(signal, s => Math.sin(s.t * phi * 0.6))
+))
 </textarea>
         </div>
     </div>

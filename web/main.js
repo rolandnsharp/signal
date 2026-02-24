@@ -87,7 +87,9 @@ function log(text, cls) {
     output.scrollTop = output.scrollHeight;
 }
 
-async function startAudio() {
+let playing = false;
+
+async function ensureAudio() {
     if (audioCtx) return;
     audioCtx = new AudioContext();
     await audioCtx.audioWorklet.addModule('./web/processor.js', { type: 'module' });
@@ -105,14 +107,12 @@ async function startAudio() {
         }
     };
 
-    startBtn.textContent = 'Audio Running';
-    startBtn.disabled = true;
     log('Audio started (' + audioCtx.sampleRate + ' Hz)');
 }
 
 function sendCode() {
     if (!workletNode) {
-        log('Click "Start Audio" first.', 'error');
+        log('Click "Play" first.', 'error');
         return;
     }
     const code = editor.value.trim();
@@ -120,13 +120,27 @@ function sendCode() {
     log('> ' + (code.length > 80 ? code.slice(0, 80) + '...' : code), 'cmd');
     const wrap = editor.closest('.editor-wrap');
     wrap.classList.remove('flash');
-    void wrap.offsetWidth; // reflow to restart animation
+    void wrap.offsetWidth;
     wrap.classList.add('flash');
     wrap.addEventListener('animationend', () => wrap.classList.remove('flash'), { once: true });
     workletNode.port.postMessage({ type: 'eval', code });
 }
 
-startBtn.addEventListener('click', startAudio);
+async function togglePlay() {
+    if (!playing) {
+        await ensureAudio();
+        sendCode();
+        startBtn.textContent = 'Stop';
+        playing = true;
+    } else {
+        workletNode.port.postMessage({ type: 'eval', code: 'clear(0.5)' });
+        log('Stopping with 0.5s fadeout...');
+        startBtn.textContent = 'Play';
+        playing = false;
+    }
+}
+
+startBtn.addEventListener('click', togglePlay);
 
 editor.addEventListener('keydown', (e) => {
     // Ctrl/Cmd + Enter to evaluate
@@ -146,4 +160,4 @@ editor.addEventListener('keydown', (e) => {
     }
 });
 
-log('Ready. Click "Start Audio", then type code and press Ctrl+Enter.');
+log('Ready. Click "Play" to start, Ctrl+Enter to evaluate.');
