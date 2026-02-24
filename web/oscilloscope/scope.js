@@ -48,10 +48,10 @@ function draw() {
     let x, y;
     if (mode === 'yt') {
       x = (i / len) * w;
-      y = (1 - bufferL[i]) * h / 2;
+      y = (1 - bufferL[i] * 1.5) * h / 2;
     } else {
-      x = (1 + bufferL[i]) * w / 2;
-      y = (1 - bufferR[i]) * h / 2;
+      x = (1 + bufferL[i] * 1.5) * w / 2;
+      y = (1 - bufferR[i] * 1.5) * h / 2;
     }
     if (i === 0) ctx.moveTo(x, y);
     else ctx.lineTo(x, y);
